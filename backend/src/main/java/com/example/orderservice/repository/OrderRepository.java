@@ -38,3 +38,4 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "ORDER BY o.orderDate DESC")
     List<OrderListItemDto> findOrdersByStatusWithTotals(@Param("status") OrderStatus status);
 }
+
