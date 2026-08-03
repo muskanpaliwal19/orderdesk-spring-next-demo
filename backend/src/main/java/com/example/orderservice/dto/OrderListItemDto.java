@@ -20,7 +20,7 @@ public class OrderListItemDto {
         this.id = id;
         this.customerName = customerName;
         this.customerEmail = customerEmail;
-        this.status = status.name().toLowerCase();
+        this.status = status.getValue();
         this.totalCents = totalCents;
         this.orderDate = orderDate.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
         this.notes = notes;
