@@ -13,8 +13,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT new com.example.orderservice.dto.OrderListItemDto(" +
             "o.id, " +
-            "COALESCE(c.name, \'Deleted Customer\'), " +
-            "COALESCE(c.email, \'\'), " +
+            "COALESCE(c.name, 'Deleted Customer'), " +
+            "COALESCE(c.email, ''), " +
             "o.status, " +
             "COALESCE(SUM(oi.quantity * oi.unitPriceCents), 0L), " +
             "o.orderDate, " +
@@ -26,8 +26,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT new com.example.orderservice.dto.OrderListItemDto(" +
             "o.id, " +
-            "COALESCE(c.name, \'Deleted Customer\'), " +
-            "COALESCE(c.email, \'\'), " +
+            "COALESCE(c.name, 'Deleted Customer'), " +
+            "COALESCE(c.email, ''), " +
             "o.status, " +
             "COALESCE(SUM(oi.quantity * oi.unitPriceCents), 0L), " +
             "o.orderDate, " +
