@@ -52,9 +52,9 @@ public class OrderService {
                 .map(OrderItemRequest::getProductId)
                 .toList();
 
-        List<Product> products = productRepository.findByIdInAndIsActiveTrue(productIds);
+        List<Product> activeProducts = productRepository.findByIdInAndIsActiveTrue(productIds);
 
-        Map<Long, Product> productMap = products.stream()
+        Map<Long, Product> productMap = activeProducts.stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity()));
 
         Order order = new Order();
