@@ -15,12 +15,7 @@ const formatCurrency = (cents: number): string => {
   }).format(dollars);
 };
 
-const RevenueStatCard: React.FC<RevenueStatCardProps> = ({
-  totalCents,
-  isLoading,
-  isError,
-}) => {
-  const DollarIcon = () => (
+const DollarIcon = () => (
     <svg
       className="w-4 h-4 text-gray-400"
       fill="none"
@@ -37,6 +32,11 @@ const RevenueStatCard: React.FC<RevenueStatCardProps> = ({
     </svg>
   );
 
+const RevenueStatCard: React.FC<RevenueStatCardProps> = ({
+  totalCents,
+  isLoading,
+  isError,
+}) => {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 max-w-xs">
       <div className="flex items-center gap-2 mb-1">
