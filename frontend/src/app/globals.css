@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f6f3ed;
+  --ink: #1e1b16;
+  --muted: #71685d;
+  --card: #fffaf0;
+  --line: #e1d7c7;
+  --brand: #245f4f;
+  --brand-2: #d36b37;
+}
+
+body {
+  background: radial-gradient(circle at top left, #fbe6c2, transparent 32rem), var(--bg);
+  color: var(--ink);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 27, 22, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 40;
+  transition: opacity 200ms;
+}
+
+.slide-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(520px, 100%);
+  background: var(--card);
+  border-left: 1px solid var(--line);
+  box-shadow: -20px 0 60px rgba(52, 37, 17, 0.12);
+  z-index: 50;
+  transition: transform 250ms ease;
+  overflow-y: auto;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px) }
+  to { opacity: 1; transform: translateY(0) }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 150ms ease;
+}
