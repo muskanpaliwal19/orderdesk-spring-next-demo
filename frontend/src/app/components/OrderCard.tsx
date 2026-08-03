@@ -1,5 +1,5 @@
 
-import { Order } from '@/types/order';
+import type { Order } from '@/types/order';
 import StatusBadge from './StatusBadge';
 
 function formatCurrency(cents: number) {
