@@ -15,7 +15,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorize -> authorize
-                .anyRequest().authenticated()
+                .anyRequest().authenticated() // By default, all requests are authenticated.
             );
         return http.build();
     }
