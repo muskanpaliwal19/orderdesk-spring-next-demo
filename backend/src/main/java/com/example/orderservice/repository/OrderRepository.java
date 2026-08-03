@@ -1,7 +1,7 @@
 package com.example.orderservice.repository;
 
 import com.example.orderservice.dto.OrderSummaryDto;
-import com.example.orderservice.model.Order;
+import com.example.orderservice.model.Order;\nimport com.example.orderservice.model.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

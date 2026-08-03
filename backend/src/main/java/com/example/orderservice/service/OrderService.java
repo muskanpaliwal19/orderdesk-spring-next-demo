@@ -1,24 +1,111 @@
 package com.example.orderservice.service;
 
+import com.example.orderservice.dto.CreateOrderRequest;
+import com.example.orderservice.dto.OrderItemRequest;
 import com.example.orderservice.dto.OrderSummaryDto;
+import com.example.orderservice.model.AuditLog;
+import com.example.orderservice.model.Customer;
+import com.example.orderservice.model.Order;
+import com.example.orderservice.model.OrderItem;
+import com.example.orderservice.model.Product;
+import com.example.orderservice.repository.AuditLogRepository;
+import com.example.orderservice.repository.CustomerRepository;
+import com.example.orderservice.repository.OrderItemRepository;
 import com.example.orderservice.repository.OrderRepository;
+import com.example.orderservice.repository.ProductRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final CustomerRepository customerRepository;
+    private final ProductRepository productRepository;
+    private final AuditLogRepository auditLogRepository;
 
+
+    @Transactional
+    public Order createOrder(CreateOrderRequest request) {
+        if (request.getItems() == null || request.getItems().isEmpty()) {
+            throw new IllegalArgumentException("Order must contain at least one item.");
+        }
+
+        Long currentUserId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        Customer customer = customerRepository.findById(currentUserId)
+                .orElseThrow(() -> new EntityNotFoundException("Customer not found with id: " + currentUserId));
+
+        List<Long> productIds = request.getItems().stream()
+                .map(OrderItemRequest::getProductId)
+                .toList();
+
+        List<Product> products = productRepository.findByIdInAndIsActiveTrue(productIds);
+
+        Map<Long, Product> productMap = products.stream()
+                .collect(Collectors.toMap(Product::getId, Function.identity()));
+
+        Order order = new Order();
+        order.setCustomer(customer);
+        order.setOrderDate(OffsetDateTime.now());
+        order.setStatus("CREATED");
+
+        List<OrderItem> orderItems = request.getItems().stream()
+                .map(itemRequest -> {
+                    Product product = productMap.get(itemRequest.getProductId());
+                    if (product == null) {
+                        return null; // Will be filtered out later
+                    }
+                    OrderItem orderItem = new OrderItem();
+                    orderItem.setProduct(product);
+                    orderItem.setQuantity(itemRequest.getQuantity());
+                    orderItem.setUnitPrice(product.getPrice()); // Snapshot price
+                    orderItem.setOrder(order);
+                    return orderItem;
+                })
+                .filter(java.util.Objects::nonNull)
+                .collect(Collectors.toList());
+
+        if (orderItems.isEmpty()) {
+            throw new IllegalArgumentException("No active products found to create order.");
+        }
+
+        order.setOrderItems(orderItems);
+
+        BigDecimal totalAmount = orderItems.stream()
+                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        order.setTotalAmount(totalAmount);
+
+        Order savedOrder = orderRepository.save(order);
+        orderItemRepository.saveAll(orderItems);
+        
+        AuditLog auditLog = new AuditLog();
+        auditLog.setEntityId(savedOrder.getId());
+        auditLog.setEntityName("order");
+        auditLog.setAction("created");
+        auditLogRepository.save(auditLog);
+
+        return savedOrder;
+    }
+
+    @Transactional(readOnly = true)
     public List<OrderSummaryDto> getAllOrderSummaries() {
         return orderRepository.findAllOrderSummaries();
     }
 
+    @Transactional(readOnly = true)
     public List<OrderSummaryDto> getOrderSummariesByStatus(String status) {
         return orderRepository.findOrderSummariesByStatus(status);
     }
