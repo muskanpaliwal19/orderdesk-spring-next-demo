@@ -1,1 +1,21 @@
-package com.example.orderservice.dto;\n\nimport com.example.orderservice.model.Order;\nimport com.example.orderservice.model.OrderItem;\n\npublic class OrderMapper {\n\n    public static OrderListItemDto toDto(Order order) {\n        long totalCents = order.getTotalAmountCents();\n\n        return new OrderListItemDto(\n                order.getId(),\n                order.getCustomer().getName(),\n                order.getCustomer().getEmail(),\n                order.getStatus(),\n                totalCents,\n                order.getOrderDate(),\n                order.getNotes()\n        );\n    }\n}\n
+package com.example.orderservice.dto;
+
+import com.example.orderservice.model.Order;
+import com.example.orderservice.model.OrderItem;
+
+public class OrderMapper {
+
+    public static OrderListItemDto toDto(Order order) {
+        long totalCents = order.getTotalAmountCents();
+
+        return new OrderListItemDto(
+                order.getId(),
+                order.getCustomer().getName(),
+                order.getCustomer().getEmail(),
+                order.getStatus(),
+                totalCents,
+                order.getOrderDate(),
+                order.getNotes()
+        );
+    }
+}
