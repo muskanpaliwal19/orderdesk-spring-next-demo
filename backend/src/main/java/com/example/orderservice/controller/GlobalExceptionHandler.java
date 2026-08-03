@@ -1,6 +1,8 @@
 package com.example.orderservice.controller;
 
-import jakarta.persistence.EntityNotFoundException;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;
+import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -8,11 +10,15 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
-public class GlobalExceptionHandler {\n\n    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(GlobalExceptionHandler.class);
+public class GlobalExceptionHandler {
+
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleEntityNotFoundException(EntityNotFoundException ex) {
@@ -28,9 +34,17 @@ public class GlobalExceptionHandler {\n\n    private static final org.slf4j.Logg
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, Object> errors = ex.getBindingResult().getFieldErrors().stream()
-                .collect(Collectors.toMap(fe -> fe.getField(), fe -> fe.getDefaultMessage()));
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        List<Map<String, String>> errors = ex.getBindingResult().getFieldErrors().stream()
+                .map(fe -> {
+                    Map<String, String> error = new HashMap<>();
+                    error.put("field", fe.getField());
+                    error.put("message", fe.getDefaultMessage());
+                    return error;
+                })
+                .collect(Collectors.toList());
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("errors", errors);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
