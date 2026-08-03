@@ -17,6 +17,11 @@ public class OrderCreatedEvent extends ApplicationEvent implements Auditable {
     }
 
     @Override
+    public String getEventName() {
+        return "OrderCreated";
+    }
+
+    @Override
     public Map<String, Object> getEventDetails() {
         return Collections.singletonMap("orderId", orderId);
     }

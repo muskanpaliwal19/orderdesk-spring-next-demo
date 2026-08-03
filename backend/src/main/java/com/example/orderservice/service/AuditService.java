@@ -1,23 +1,26 @@
 package com.example.orderservice.service;
 
-import com.example.orderservice.event.Auditable;
 import com.example.orderservice.event.OrderCreatedEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.event.EventListener;
+import com.example.orderservice.model.AuditAction;
+import com.example.orderservice.model.AuditEntityType;
+import com.example.orderservice.model.AuditLog;
+import com.example.orderservice.repository.AuditLogRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
+@RequiredArgsConstructor
 public class AuditService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuditService.class);
+    private final AuditLogRepository auditLogRepository;
 
-    @EventListener
-    public void onOrderCreated(Auditable event) {
-        if (event instanceof OrderCreatedEvent) {
-            logger.info("Audit event: Order created with ID {}", ((OrderCreatedEvent) event).getOrderId());
-        } else {
-            logger.info("Audit event: {}", event.getEventDetails());
-        }
+    @TransactionalEventListener
+    public void handleOrderCreatedEvent(OrderCreatedEvent event) {
+        AuditLog auditLog = new AuditLog();
+        auditLog.setEntityId(event.getOrder().getId());
+        auditLog.setEntityName(AuditEntityType.ORDER.name().toLowerCase());
+        auditLog.setAction(AuditAction.CREATED.name().toLowerCase());
+        auditLogRepository.save(auditLog);
     }
 }
