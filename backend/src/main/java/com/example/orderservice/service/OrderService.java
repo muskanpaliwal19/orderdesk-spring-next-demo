@@ -19,7 +19,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -36,16 +35,15 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final AuditLogRepository auditLogRepository;
 
-
     @Transactional
     public Order createOrder(CreateOrderRequest request) {
         if (request.getItems() == null || request.getItems().isEmpty()) {
             throw new IllegalArgumentException("Order must contain at least one item.");
         }
 
-        Long currentUserId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
-        Customer customer = customerRepository.findById(currentUserId)
-                .orElseThrow(() -> new EntityNotFoundException("Customer not found with id: " + currentUserId));
+        Long customerId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new EntityNotFoundException("Customer not found with id: " + customerId));
 
         List<Long> productIds = request.getItems().stream()
                 .map(OrderItemRequest::getProductId)
@@ -70,7 +68,7 @@ public class OrderService {
                     OrderItem orderItem = new OrderItem();
                     orderItem.setProduct(product);
                     orderItem.setQuantity(itemRequest.getQuantity());
-                    orderItem.setUnitPrice(product.getPrice()); // Snapshot price
+                    orderItem.setUnitPriceCents(product.getPriceCents()); // Snapshot price
                     orderItem.setOrder(order);
                     return orderItem;
                 })
@@ -83,13 +81,13 @@ public class OrderService {
 
         order.setOrderItems(orderItems);
 
-        BigDecimal totalAmount = orderItems.stream()
-                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        order.setTotalAmount(totalAmount);
+        Integer totalAmountCents = orderItems.stream()
+                .mapToInt(item -> item.getUnitPriceCents() * item.getQuantity())
+                .sum();
+        order.setTotalAmountCents(totalAmountCents);
 
         Order savedOrder = orderRepository.save(order);
-        orderItemRepository.saveAll(orderItems);
+
         
         AuditLog auditLog = new AuditLog();
         auditLog.setEntityId(savedOrder.getId());
