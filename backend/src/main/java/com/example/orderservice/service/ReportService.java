@@ -2,12 +2,10 @@ package com.example.orderservice.service;
 
 import com.example.orderservice.dto.RevenueByStatusDto;
 import com.example.orderservice.dto.RevenueReportDto;
-import com.example.orderservice.model.OrderStatus;
 import com.example.orderservice.repository.OrderItemRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ReportService {
@@ -19,21 +17,7 @@ public class ReportService {
     }
 
     public RevenueReportDto getRevenueReport() {
-        List<Object[]> results = orderItemRepository.calculateRevenueByStatus();
-        
-        List<RevenueByStatusDto> byStatus = results.stream()
-                .map(result -> {
-                    String status = ((OrderStatus) result[0]).name();
-                    long orderCount = ((Number) result[1]).longValue();
-                    long totalCents = result[2] == null ? 0L : ((Number) result[2]).longValue();
-                    return new RevenueByStatusDto(status, orderCount, totalCents);
-                })
-                .collect(Collectors.toList());
-
-        long totalCents = byStatus.stream()
-                .mapToLong(RevenueByStatusDto::totalCents)
-                .sum();
-
-        return new RevenueReportDto(totalCents, byStatus);
+        List<RevenueByStatusDto> revenueByStatus = orderItemRepository.calculateRevenueByStatus();
+        return new RevenueReportDto(revenueByStatus);
     }
 }
