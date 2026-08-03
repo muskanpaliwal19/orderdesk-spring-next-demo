@@ -51,6 +51,7 @@ export default function OrdersPage() {
   useEffect(() => {
     async function fetchOrders() {
       setLoading(true);
+      setError(null);
       const url = statusFilter ? `/api/orders?status=${statusFilter.toUpperCase()}` : '/api/orders';
       try {
         const res = await fetch(url);
@@ -61,7 +62,7 @@ export default function OrdersPage() {
         setOrders(data);
       } catch (error) {
         console.error(error);
-        // Handle error state in UI if necessary
+        setError('Failed to load orders. Please try again later.');
       } finally {
         setLoading(false);
       }
