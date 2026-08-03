@@ -36,6 +36,9 @@ public class Order {
     @Column(nullable = false)
     private OrderStatus status;
 
+    @Column(length = 1000)
+    private String notes;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
 
