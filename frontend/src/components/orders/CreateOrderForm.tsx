@@ -43,6 +43,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onCancel, onOrderCrea
         setCustomers(customersData);
         setProducts(productsData);
       } catch (e) {
+        console.error('Failed to load initial form data:', e);
         setFormError('Failed to load form data. Please try again later.');
         toast.error('Failed to load form data. Please try again later.');
       }
