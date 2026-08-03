@@ -1,4 +1,4 @@
-type OrderData = {
+export type OrderData = {
   customerId: number;
   items: { productId: number | undefined; quantity: number }[];
 };

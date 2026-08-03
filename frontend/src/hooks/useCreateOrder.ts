@@ -36,6 +36,7 @@ export const useCreateOrder = ({ onOrderCreated, onCancel }: UseCreateOrderProps
         toast.error(errorMessage);
       }
     } catch (e) {
+            console.error('An unexpected error occurred during order creation:', e);
       const message = 'An unexpected error occurred. Please check your connection and try again.';
       setError(message);
       toast.error(message);
