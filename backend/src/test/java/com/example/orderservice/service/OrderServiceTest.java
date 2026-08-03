@@ -1,21 +1,27 @@
-
 package com.example.orderservice.service;
 
 import com.example.orderservice.dto.CreateOrderRequest;
 import com.example.orderservice.dto.OrderItemRequest;
+import com.example.orderservice.model.AuditLog;
 import com.example.orderservice.model.Customer;
 import com.example.orderservice.model.Order;
 import com.example.orderservice.model.Product;
+import com.example.orderservice.repository.AuditLogRepository;
 import com.example.orderservice.repository.CustomerRepository;
 import com.example.orderservice.repository.OrderItemRepository;
 import com.example.orderservice.repository.OrderRepository;
 import com.example.orderservice.repository.ProductRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -25,7 +31,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceTest {
@@ -42,6 +47,9 @@ public class OrderServiceTest {
     @Mock
     private CustomerRepository customerRepository;
 
+    @Mock
+    private AuditLogRepository auditLogRepository;
+
     @InjectMocks
     private OrderService orderService;
 
@@ -52,6 +60,8 @@ public class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
+        SecurityContextHolder.clearContext();
+
         activeProduct1 = new Product();
         activeProduct1.setId(1L);
         activeProduct1.setName("Laptop");
@@ -74,10 +84,17 @@ public class OrderServiceTest {
         customer.setId(1L);
         customer.setEmail("test@example.com");
     }
+    
+    private void mockSecurityContext(Long customerId) {
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getName()).thenReturn(String.valueOf(customerId));
+    }
 
-    private CreateOrderRequest createRequest(Long customerId, List<OrderItemRequest> items) {
+    private CreateOrderRequest createRequest(List<OrderItemRequest> items) {
         CreateOrderRequest request = new CreateOrderRequest();
-        request.setCustomerId(customerId);
         request.setItems(items);
         return request;
     }
@@ -92,13 +109,19 @@ public class OrderServiceTest {
     @Test
     void createOrder_Success() {
         // AC1: Successful Order Creation
+        long customerId = 1L;
+        mockSecurityContext(customerId);
         OrderItemRequest item1 = createItemRequest(1L, 1);
         OrderItemRequest item2 = createItemRequest(2L, 2);
-        CreateOrderRequest request = createRequest(1L, List.of(item1, item2));
+        CreateOrderRequest request = createRequest(List.of(item1, item2));
 
-        when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
-        when(productRepository.findAllById(List.of(1L, 2L))).thenReturn(List.of(activeProduct1, activeProduct2));
-        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+        when(productRepository.findByIdInAndIsActiveTrue(List.of(1L, 2L))).thenReturn(List.of(activeProduct1, activeProduct2));
+        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
+            Order o = invocation.getArgument(0);
+            o.setId(100L); // Set ID for audit log test
+            return o;
+        });
 
         Order result = orderService.createOrder(request);
 
@@ -110,17 +133,27 @@ public class OrderServiceTest {
 
         verify(orderRepository, times(1)).save(any(Order.class));
         verify(orderItemRepository, times(1)).saveAll(any());
+        
+        ArgumentCaptor<AuditLog> auditLogCaptor = ArgumentCaptor.forClass(AuditLog.class);
+        verify(auditLogRepository).save(auditLogCaptor.capture());
+        AuditLog auditLog = auditLogCaptor.getValue();
+
+        assertEquals(result.getId(), auditLog.getEntityId());
+        assertEquals("order", auditLog.getEntityName());
+        assertEquals("created", auditLog.getAction());
     }
 
     @Test
     void createOrder_ShouldSkipInactiveProducts() {
         // AC2: Inactive Products Skipped
+        long customerId = 1L;
+        mockSecurityContext(customerId);
         OrderItemRequest item1 = createItemRequest(1L, 1);
         OrderItemRequest item2 = createItemRequest(3L, 1);
-        CreateOrderRequest request = createRequest(1L, List.of(item1, item2));
+        CreateOrderRequest request = createRequest(List.of(item1, item2));
 
-        when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
-        when(productRepository.findAllById(List.of(1L, 3L))).thenReturn(List.of(activeProduct1, inactiveProduct));
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+        when(productRepository.findByIdInAndIsActiveTrue(List.of(1L, 3L))).thenReturn(List.of(activeProduct1));
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Order result = orderService.createOrder(request);
@@ -137,11 +170,13 @@ public class OrderServiceTest {
     @Test
     void createOrder_FailsWhenAllProductsAreInactive() {
         // AC3: All Products Inactive
+        long customerId = 1L;
+        mockSecurityContext(customerId);
         OrderItemRequest item1 = createItemRequest(3L, 1);
-        CreateOrderRequest request = createRequest(1L, List.of(item1));
+        CreateOrderRequest request = createRequest(List.of(item1));
 
-        when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
-        when(productRepository.findAllById(List.of(3L))).thenReturn(List.of(inactiveProduct));
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+        when(productRepository.findByIdInAndIsActiveTrue(List.of(3L))).thenReturn(Collections.emptyList());
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> orderService.createOrder(request));
 
@@ -152,7 +187,8 @@ public class OrderServiceTest {
     @Test
     void createOrder_FailsForEmptyProductList() {
         // AC4: Empty Product List
-        CreateOrderRequest request = createRequest(1L, Collections.emptyList());
+        mockSecurityContext(1L);
+        CreateOrderRequest request = createRequest(Collections.emptyList());
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> orderService.createOrder(request));
 
@@ -163,7 +199,8 @@ public class OrderServiceTest {
     @Test
     void createOrder_FailsForNullProductList() {
         // AC4: Empty Product List (null case)
-        CreateOrderRequest request = createRequest(1L, null);
+        mockSecurityContext(1L);
+        CreateOrderRequest request = createRequest(null);
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> orderService.createOrder(request));
 
@@ -174,11 +211,13 @@ public class OrderServiceTest {
     @Test
     void createOrder_FailsWhenNoProductsFound() {
         // AC5: Non-existent Products
+        long customerId = 1L;
+        mockSecurityContext(customerId);
         OrderItemRequest item1 = createItemRequest(99L, 1);
-        CreateOrderRequest request = createRequest(1L, List.of(item1));
+        CreateOrderRequest request = createRequest(List.of(item1));
 
-        when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
-        when(productRepository.findAllById(List.of(99L))).thenReturn(Collections.emptyList());
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+        when(productRepository.findByIdInAndIsActiveTrue(List.of(99L))).thenReturn(Collections.emptyList());
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> orderService.createOrder(request));
 
@@ -188,10 +227,12 @@ public class OrderServiceTest {
     
     @Test
     void createOrder_FailsWhenCustomerNotFound() {
+        long customerId = 99L;
+        mockSecurityContext(customerId);
         OrderItemRequest item1 = createItemRequest(1L, 1);
-        CreateOrderRequest request = createRequest(99L, List.of(item1));
+        CreateOrderRequest request = createRequest(List.of(item1));
 
-        when(customerRepository.findById(99L)).thenReturn(Optional.empty());
+        when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(EntityNotFoundException.class, () -> orderService.createOrder(request));
         
