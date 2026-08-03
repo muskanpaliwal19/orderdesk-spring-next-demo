@@ -1,6 +1,6 @@
 package com.example.orderservice.controller;
 
-import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityNotFoundException;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,10 +12,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler {\n\n    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleEntityNotFoundException(EntityNotFoundException ex) {
+        logger.error("Entity not found", ex);
         return new ResponseEntity<>(Map.of("error", "The requested resource was not found."), HttpStatus.NOT_FOUND);
     }
 
