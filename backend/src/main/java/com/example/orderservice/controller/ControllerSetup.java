@@ -1,1 +1,16 @@
-package com.example.orderservice.controller;\n\nimport org.springframework.beans.propertyeditors.StringTrimmerEditor;\nimport org.springframework.web.bind.WebDataBinder;\nimport org.springframework.web.bind.annotation.ControllerAdvice;\nimport org.springframework.web.bind.annotation.InitBinder;\n\n@ControllerAdvice\npublic class ControllerSetup {\n\n    @InitBinder\n    public void initBinder(WebDataBinder binder) {\n        // Treat empty strings as null for all string parameters\n        binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));\n    }\n}\n
+package com.example.orderservice.controller;
+
+import org.springframework.beans.propertyeditors.StringTrimmerEditor;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.InitBinder;
+
+@ControllerAdvice
+public class ControllerSetup {
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        // Treat empty strings as null for all string parameters
+        binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
+    }
+}

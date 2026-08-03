@@ -6,7 +6,9 @@ import com.example.orderservice.model.OrderItem;
 public class OrderMapper {
 
     public static OrderListItemDto toDto(Order order) {
-        long totalCents = order.getTotalAmountCents();
+        long totalCents = order.getOrderItems().stream()
+                .mapToLong(item -> (long) item.getQuantity() * item.getUnitPriceCents())
+                .sum();
 
         return new OrderListItemDto(
                 order.getId(),
