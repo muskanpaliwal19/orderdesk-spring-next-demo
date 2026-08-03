@@ -22,7 +22,8 @@ public class GlobalExceptionHandler {\n\n    private static final org.slf4j.Logg
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex) {
-        return new ResponseEntity<>(Map.of("error", ex.getMessage()), HttpStatus.BAD_REQUEST);
+        logger.error("Illegal argument exception", ex);
+        return new ResponseEntity<>(Map.of("error", "Invalid argument provided"), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
