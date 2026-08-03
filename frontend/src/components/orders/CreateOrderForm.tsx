@@ -104,8 +104,8 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onCancel, onOrderCrea
         onOrderCreated(); 
         onCancel(); 
       } else {
-        const errorData = await res.json();
-        const errorMessage = errorData.message || 'Failed to create order. Please try again.';
+        const errorData = await res.json().catch(() => null);
+        const errorMessage = errorData?.message || 'Failed to create order. Please try again.';
         setError(errorMessage);
         toast.error(errorMessage);
       }

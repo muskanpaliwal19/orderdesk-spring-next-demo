@@ -21,5 +21,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
            "WHERE o.status = :status " +
            "GROUP BY o.id, c.name, o.orderDate, o.status " +
            "ORDER BY o.orderDate DESC")
-    List<OrderSummaryDto> findOrderSummariesByStatus(@Param("status") String status);
+    List<OrderSummaryDto> findOrderSummariesByStatus(@Param("status") OrderStatus status);
 }
