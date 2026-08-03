@@ -10,11 +10,7 @@ import java.util.List;
 @Repository
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
-    @Query("""
-            SELECT o.status, COUNT(DISTINCT o.id), SUM(oi.unitPriceCents * oi.quantity)
-            FROM Order o
-            JOIN o.orderItems oi
-            GROUP BY o.status
-            """)
+    @Query("SELECT o.status, COUNT(DISTINCT o.id), SUM(oi.quantity * oi.unitPriceCents) " +
+           "FROM OrderItem oi JOIN oi.order o GROUP BY o.status ORDER BY o.status")
     List<Object[]> calculateRevenueByStatus();
 }

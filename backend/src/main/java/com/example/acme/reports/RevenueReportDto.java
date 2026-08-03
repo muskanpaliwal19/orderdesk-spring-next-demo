@@ -1,4 +1,4 @@
-package com.example.orderservice.dto;
+package com.example.acme.reports;
 
 import java.util.List;
 
