@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import LineItemRow from './LineItemRow';
-import AlertBanner from '../ui/AlertBanner';
-import { Customer } from '@/types/customer';
-import { Product } from '@/types/product';
+import AlertBanner from 'components/ui/AlertBanner';
+import { Customer } from 'types/customer';
+import { Product } from 'types/product';
 
 interface CreateOrderFormProps {
   onCancel: () => void;

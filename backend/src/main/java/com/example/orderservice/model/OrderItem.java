@@ -6,7 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigDecimal;
+
 import java.time.Instant;
 
 @Entity
@@ -30,8 +30,8 @@ public class OrderItem {
     @Column(nullable = false)
     private Integer quantity;
 
-    @Column(name = "unit_price", nullable = false, precision = 10, scale = 2)
-    private BigDecimal unitPrice;
+    @Column(name = "unit_price_cents", nullable = false)
+    private Integer unitPriceCents;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

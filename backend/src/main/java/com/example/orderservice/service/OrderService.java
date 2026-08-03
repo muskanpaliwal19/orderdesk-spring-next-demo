@@ -85,7 +85,6 @@ public class OrderService {
         order.setTotalAmount(totalAmount);
 
         orderRepository.save(order);
-        orderItemRepository.saveAll(orderItems);
 
         return order;
     }

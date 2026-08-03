@@ -6,7 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigDecimal;
+
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -29,8 +29,8 @@ public class Order {
     @Column(name = "order_date", nullable = false)
     private OffsetDateTime orderDate;
 
-    @Column(name = "total_amount", nullable = false, precision = 10, scale = 2)
-    private BigDecimal totalAmount;
+    @Column(name = "total_amount_cents", nullable = false)
+    private Integer totalAmountCents;
 
     @Column(nullable = false)
     private String status;
