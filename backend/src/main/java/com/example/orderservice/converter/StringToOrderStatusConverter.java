@@ -10,9 +10,6 @@ import java.util.Arrays;
 public class StringToOrderStatusConverter implements Converter<String, OrderStatus> {
     @Override
     public OrderStatus convert(String source) {
-        return Arrays.stream(OrderStatus.values())
-                .filter(status -> status.getValue().equalsIgnoreCase(source))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unknown status: " + source));
+        return OrderStatus.valueOf(source.toUpperCase());
     }
 }
