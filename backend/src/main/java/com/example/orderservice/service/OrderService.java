@@ -47,7 +47,7 @@ public class OrderService {
                 .map(OrderItemRequest::getProductId)
                 .toList();
 
-        List<Product> products = productRepository.findAllById(productIds);
+        List<Product> products = productRepository.findByIdInAndIsActiveTrue(productIds);
 
         Map<Long, Product> productMap = products.stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity()));
@@ -60,7 +60,7 @@ public class OrderService {
         List<OrderItem> orderItems = request.getItems().stream()
                 .map(itemRequest -> {
                     Product product = productMap.get(itemRequest.getProductId());
-                    if (product == null || !product.isActive()) {
+                    if (product == null) {
                         return null; // Will be filtered out later
                     }
                     OrderItem orderItem = new OrderItem();
