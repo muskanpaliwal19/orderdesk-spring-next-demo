@@ -13,6 +13,7 @@ import com.example.orderservice.repository.OrderRepository;
 import com.example.orderservice.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,8 +39,9 @@ public class OrderService {
             throw new IllegalArgumentException("Order must contain at least one item.");
         }
 
-        Customer customer = customerRepository.findById(request.getCustomerId())
-                .orElseThrow(() -> new EntityNotFoundException("Customer not found with id: " + request.getCustomerId()));
+        Long customerId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new EntityNotFoundException("Customer not found with id: " + customerId));
 
         List<Long> productIds = request.getItems().stream()
                 .map(OrderItemRequest::getProductId)
