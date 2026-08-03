@@ -16,7 +16,6 @@ import com.example.orderservice.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,20 +32,14 @@ import java.util.stream.Collectors;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Order createOrder(CreateOrderRequest request) {
-        if (request.getItems() == null || request.getItems().isEmpty()) {
-            throw new IllegalArgumentException("Order must contain at least one item.");
-        }
-
-        Long customerId =  Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new EntityNotFoundException("Customer not found with id: " + customerId));
+        Customer customer = customerRepository.findById(request.getCustomerId())
+                .orElseThrow(() -> new EntityNotFoundException("Customer not found with id: " + request.getCustomerId()));
 
         List<Long> productIds = request.getItems().stream()
                 .map(OrderItemRequest::getProductId)
@@ -54,20 +47,22 @@ public class OrderService {
 
         List<Product> activeProducts = productRepository.findByIdInAndIsActiveTrue(productIds);
 
+        if (activeProducts.size() != request.getItems().size()) {
+            throw new IllegalArgumentException("One or more products are inactive or do not exist.");
+        }
+
         Map<Long, Product> productMap = activeProducts.stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity()));
 
         Order order = new Order();
         order.setCustomer(customer);
         order.setOrderDate(OffsetDateTime.now());
-        order.setStatus(OrderStatus.CREATED);
+        order.setStatus(OrderStatus.NEW);
+        order.setNotes(request.getNotes());
 
         List<OrderItem> orderItems = request.getItems().stream()
                 .map(itemRequest -> {
                     Product product = productMap.get(itemRequest.getProductId());
-                    if (product == null) {
-                        return null; // Will be filtered out later
-                    }
                     OrderItem orderItem = new OrderItem();
                     orderItem.setProduct(product);
                     orderItem.setQuantity(itemRequest.getQuantity());
@@ -75,22 +70,16 @@ public class OrderService {
                     orderItem.setOrder(order);
                     return orderItem;
                 })
-                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-
-        if (orderItems.isEmpty()) {
-            throw new IllegalArgumentException("No active products found to create order.");
-        }
 
         order.setOrderItems(orderItems);
 
         BigDecimal totalAmount = orderItems.stream()
                 .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        order.setTotalAmount(totalAmount);
+        order.setTotalAmountCents(totalAmount.multiply(BigDecimal.valueOf(100)).intValue());
 
         Order savedOrder = orderRepository.save(order);
-        orderItemRepository.saveAll(orderItems);
 
         eventPublisher.publishEvent(new OrderCreatedEvent(this, savedOrder));
 
