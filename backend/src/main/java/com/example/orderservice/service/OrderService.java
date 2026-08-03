@@ -47,12 +47,16 @@ public class OrderService {
 
         List<Product> activeProducts = productRepository.findByIdInAndIsActiveTrue(productIds);
 
-        if (activeProducts.size() != request.getItems().size()) {
-            throw new IllegalArgumentException("One or more products are inactive or do not exist.");
-        }
-
         Map<Long, Product> productMap = activeProducts.stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity()));
+
+        List<OrderItemRequest> validItems = request.getItems().stream()
+                .filter(item -> productMap.containsKey(item.getProductId()))
+                .toList();
+
+        if (validItems.isEmpty()) {
+            throw new IllegalArgumentException("No valid products found in the order.");
+        }
 
         Order order = new Order();
         order.setCustomer(customer);
@@ -60,7 +64,7 @@ public class OrderService {
         order.setStatus(OrderStatus.NEW);
         order.setNotes(request.getNotes());
 
-        List<OrderItem> orderItems = request.getItems().stream()
+        List<OrderItem> orderItems = validItems.stream()
                 .map(itemRequest -> {
                     Product product = productMap.get(itemRequest.getProductId());
                     OrderItem orderItem = new OrderItem();
