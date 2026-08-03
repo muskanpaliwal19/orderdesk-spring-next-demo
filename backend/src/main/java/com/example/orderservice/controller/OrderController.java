@@ -1,6 +1,7 @@
 package com.example.orderservice.controller;
 
 import com.example.orderservice.dto.CreateOrderRequest;
+import com.example.orderservice.dto.OrderResponse;
 import com.example.orderservice.model.Order;
 import com.example.orderservice.service.OrderService;
 import jakarta.validation.Valid;
@@ -20,8 +21,9 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<Order> createOrder(@Valid @RequestBody CreateOrderRequest request) {
+    public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request) {
         Order createdOrder = orderService.createOrder(request);
-        return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);
+        OrderResponse orderResponse = OrderResponse.from(createdOrder);
+        return new ResponseEntity<>(orderResponse, HttpStatus.CREATED);
     }
 }
