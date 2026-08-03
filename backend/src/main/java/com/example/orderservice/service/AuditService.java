@@ -1,6 +1,8 @@
 package com.example.orderservice.service;
 
 import com.example.orderservice.event.OrderCreatedEvent;
+import com.example.orderservice.model.AuditAction;
+import com.example.orderservice.model.AuditEntityType;
 import com.example.orderservice.model.AuditLog;
 import com.example.orderservice.repository.AuditLogRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +19,8 @@ public class AuditService {
     public void handleOrderCreatedEvent(OrderCreatedEvent event) {
         AuditLog auditLog = new AuditLog();
         auditLog.setEntityId(event.getOrder().getId());
-        auditLog.setEntityName("order");
-        auditLog.setAction("created");
+        auditLog.setEntityName(AuditEntityType.ORDER.name().toLowerCase());
+        auditLog.setAction(AuditAction.CREATED.name().toLowerCase());
         auditLogRepository.save(auditLog);
     }
 }
