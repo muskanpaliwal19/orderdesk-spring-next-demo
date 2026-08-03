@@ -10,13 +10,13 @@ import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    @Query("SELECT new com.example.orderservice.dto.OrderSummaryDto(o.id, c.name, o.orderDate, SUM(oi.quantity * oi.unitPriceCents), o.status) " +
+    @Query("SELECT new com.example.orderservice.dto.OrderSummaryDto(o.id, c.name, o.orderDate, SUM(oi.quantity * oi.unitPriceCents), CAST(o.status AS string)) " +
            "FROM Order o JOIN o.customer c JOIN o.orderItems oi " +
            "GROUP BY o.id, c.name, o.orderDate, o.status " +
            "ORDER BY o.orderDate DESC")
     List<OrderSummaryDto> findAllOrderSummaries();
 
-    @Query("SELECT new com.example.orderservice.dto.OrderSummaryDto(o.id, c.name, o.orderDate, SUM(oi.quantity * oi.unitPriceCents), o.status) " +
+    @Query("SELECT new com.example.orderservice.dto.OrderSummaryDto(o.id, c.name, o.orderDate, SUM(oi.quantity * oi.unitPriceCents), CAST(o.status AS string)) " +
            "FROM Order o JOIN o.customer c JOIN o.orderItems oi " +
            "WHERE o.status = :status " +
            "GROUP BY o.id, c.name, o.orderDate, o.status " +

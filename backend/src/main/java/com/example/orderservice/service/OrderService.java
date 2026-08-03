@@ -1,11 +1,13 @@
-package com.example.orderservice.service;\n\nimport com.example.orderservice.model.OrderStatus;
+package com.example.orderservice.service;
 
 import com.example.orderservice.dto.CreateOrderRequest;
 import com.example.orderservice.dto.OrderItemRequest;
+import com.example.orderservice.dto.OrderSummaryDto;
 import com.example.orderservice.event.OrderCreatedEvent;
 import com.example.orderservice.model.Customer;
 import com.example.orderservice.model.Order;
 import com.example.orderservice.model.OrderItem;
+import com.example.orderservice.model.OrderStatus;
 import com.example.orderservice.model.Product;
 import com.example.orderservice.repository.CustomerRepository;
 import com.example.orderservice.repository.OrderItemRepository;
@@ -22,11 +24,13 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -92,5 +96,21 @@ public class OrderService {
         eventPublisher.publishEvent(new OrderCreatedEvent(savedOrder));
 
         return savedOrder;
+    }
+
+    public List<OrderSummaryDto> findAll(Optional<String> status) {
+        return status.map(this::mapStatusToEnum)
+                .map(orderRepository::findOrderSummariesByStatus)
+                .orElseGet(orderRepository::findAllOrderSummaries);
+    }
+
+    private OrderStatus mapStatusToEnum(String status) {
+        return switch (status.toLowerCase()) {
+            case "new" -> OrderStatus.CREATED;
+            case "paid" -> OrderStatus.PENDING;
+            case "shipped" -> OrderStatus.SHIPPED;
+            case "cancelled" -> OrderStatus.CANCELLED;
+            default -> throw new IllegalArgumentException("Invalid status: " + status);
+        };
     }
 }
