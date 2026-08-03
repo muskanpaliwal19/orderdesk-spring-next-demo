@@ -16,19 +16,15 @@ const OrdersPage: React.FC = () => {
   const fetchOrders = useCallback(async () => {
     setIsLoading(true);
     setError(null);
+    const url = statusFilter ? `/api/orders?status=${statusFilter}` : '/api/orders';
     try {
-      const res = await fetch('/api/orders');
+      const res = await fetch(url);
       if (!res.ok) {
         throw new Error('Failed to fetch orders');
       }
-      const rawData = await res.json();
-      const transformedOrders: Order[] = rawData.map((order: any) => ({
-        ...order,
-        totalCents: order.totalCents || 0,
-      }));
-      setOrders(transformedOrders);
+      setOrders(await res.json());
     } catch (err) {
-        if(err instanceof Error) {
+        if (err instanceof Error) {
             setError(err.message);
         } else {
             setError("An unknown error occurred.");
@@ -36,15 +32,11 @@ const OrdersPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [statusFilter]);
 
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
-
-  const filteredOrders = statusFilter
-    ? orders.filter((order) => order.status === statusFilter)
-    : orders;
 
   return (
     <main className="max-w-5xl mx-auto px-4 py-8">
@@ -82,9 +74,9 @@ const OrdersPage: React.FC = () => {
         <div className=\"text-center py-16\"><p>Loading orders...</p></div>
       ) : error ? (
         <div className="text-red-500 text-center py-16">{error}</div>
-      ) : filteredOrders.length > 0 ? (
+      ) : orders.length > 0 ? (
         <div className="grid gap-3">
-          {filteredOrders.map((order) => (
+          {orders.map((order) => (
             <OrderCard key={order.id} order={order} />
           ))}
         </div>
