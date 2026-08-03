@@ -6,6 +6,7 @@ import LineItemRow from './LineItemRow';
 import AlertBanner from '../ui/AlertBanner';
 import { Customer } from '@/types/customer';
 import { Product } from '@/types/product';
+import { useCreateOrder } from '@/hooks/useCreateOrder';
 
 interface CreateOrderFormProps {
   onCancel: () => void;
@@ -19,8 +20,13 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onCancel, onOrderCrea
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
   const [lineItems, setLineItems] = useState<LineItem[]>([{ quantity: 1 }]);
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  
+  const { 
+    createOrder, 
+    isSubmitting, 
+    error: submissionError 
+  } = useCreateOrder({ onOrderCreated, onCancel });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,7 +43,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onCancel, onOrderCrea
         setCustomers(customersData);
         setProducts(productsData);
       } catch (e) {
-        setError('Failed to load form data. Please try again later.');
+        setFormError('Failed to load form data. Please try again later.');
         toast.error('Failed to load form data. Please try again later.');
       }
     };
@@ -73,16 +79,17 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onCancel, onOrderCrea
   };
 
   const handleSubmit = async () => {
-    setError(null);
+    setFormError(null);
+
     if (!selectedCustomerId) {
-      setError('Please select a customer');
+      setFormError('Please select a customer');
       return;
     }
 
     const validLineItems = lineItems.filter(item => item.productId && item.quantity > 0);
 
     if (validLineItems.length === 0) {
-        setError('Please add at least one valid line item.');
+        setFormError('Please add at least one valid line item.');
         return;
     }
 
@@ -91,34 +98,11 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onCancel, onOrderCrea
       items: validLineItems.map(item => ({ productId: item.productId, quantity: item.quantity })),
     };
 
-    setIsSubmitting(true);
-    try {
-      const res = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData),
-      });
-
-      if (res.ok) {
-        toast.success('Order created successfully!');
-        onOrderCreated(); 
-        onCancel(); 
-      } else {
-        const errorData = await res.json().catch(() => null);
-        const errorMessage = errorData?.message || 'Failed to create order. Please try again.';
-        setError(errorMessage);
-        toast.error(errorMessage);
-      }
-    } catch (e) {
-      const message = 'An unexpected error occurred. Please check your connection and try again.';
-      setError(message);
-      toast.error(message);
-    } finally {
-      setIsSubmitting(false);
-    }
+    await createOrder(orderData);
   };
 
   const total = calculateTotal();
+  const displayError = formError || submissionError;
 
   return (
     <div className="p-7">
@@ -176,10 +160,10 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onCancel, onOrderCrea
             <div className="text-gray-500 text-xs mt-1">{lineItems.length} item(s) · Final total confirmed after submission</div>
         </div>
         
-        {error && <AlertBanner variant="error" title={error} />}
+        {displayError && <AlertBanner variant="error" title={displayError} />}
 
         <div className="grid grid-cols-2 gap-2.5">
-            <button onClick={onCancel} disabled={isSubmitting} className="rounded-2xl border border-gray-200 p-3 bg-white text-gray-800 font-bold text-sm disabled:opacity-50">
+            <button onClick={onCancel} disabled={isSubmitting} className="rounded-2xl border border-gray-200 p-3 bg-white text-sm disabled:opacity-50">
                 Cancel
             </button>
             <button onClick={handleSubmit} disabled={isSubmitting} className="rounded-2xl border border-transparent p-3 bg-green-700 text-white font-extrabold text-sm disabled:opacity-50 disabled:cursor-not-allowed">

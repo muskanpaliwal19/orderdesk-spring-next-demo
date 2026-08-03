@@ -57,7 +57,7 @@ public class OrderService {
         Order order = new Order();
         order.setCustomer(customer);
         order.setOrderDate(OffsetDateTime.now());
-        order.setStatus("CREATED");
+        order.setStatus(OrderStatus.CREATED);
 
         List<OrderItem> orderItems = request.getItems().stream()
                 .map(itemRequest -> {
