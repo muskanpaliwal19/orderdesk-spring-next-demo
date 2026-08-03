@@ -1,75 +1,20 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import OrderSlidePanel from '../components/orders/OrderSlidePanel';
-import { Order } from '@/types/order';
 import OrderCard from '../components/OrderCard';
 import EmptyState from '../components/EmptyState';
 import RevenueStatCard from '../components/RevenueStatCard';
+import { useOrders } from '@/hooks/useOrders';
+import { useRevenue } from '@/hooks/useRevenue';
 
-interface RevenueData {
-  totalRevenue: number;
-}
 
 const DashboardPage: React.FC = () => {
   const [isPanelOpen, setPanelOpen] = useState(false);
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [isLoadingOrders, setIsLoadingOrders] = useState(true);
-  const [ordersError, setOrdersError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('');
 
-  const [revenueData, setRevenueData] = useState<RevenueData | null>(null);
-  const [isLoadingRevenue, setIsLoadingRevenue] = useState(true);
-  const [revenueError, setRevenueError] = useState<string | null>(null);
-
-  const fetchOrders = useCallback(async () => {
-    setIsLoadingOrders(true);
-    setOrdersError(null);
-    const url = statusFilter ? `/api/orders?status=${statusFilter}` : '/api/orders';
-    try {
-      const res = await fetch(url);
-      if (!res.ok) {
-        throw new Error('Failed to fetch orders');
-      }
-      setOrders(await res.json());
-    } catch (err) {
-        if (err instanceof Error) {
-            setOrdersError(err.message);
-        } else {
-            setOrdersError("An unknown error occurred.");
-        }
-    } finally {
-      setIsLoadingOrders(false);
-    }
-  }, [statusFilter]);
-
-  const fetchRevenue = async () => {
-    setIsLoadingRevenue(true);
-    setRevenueError(null);
-    try {
-        const res = await fetch('/api/reports/revenue');
-        if (!res.ok) {
-            throw new Error('Failed to fetch revenue data');
-        }
-        setRevenueData(await res.json());
-    } catch (err) {
-        if (err instanceof Error) {
-            setRevenueError(err.message);
-        } else {
-            setRevenueError("An unknown error occurred.");
-        }
-    } finally {
-        setIsLoadingRevenue(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
-
-  useEffect(() => {
-    fetchRevenue();
-  }, []);
+  const { orders, isLoading: isLoadingOrders, error: ordersError, refetch: refetchOrders } = useOrders(statusFilter);
+  const { data: revenueData, isLoading: isLoadingRevenue, error: revenueError, refetch: refetchRevenue } = useRevenue();
 
   return (
     <main className="max-w-5xl mx-auto px-4 py-8">
@@ -138,8 +83,8 @@ const DashboardPage: React.FC = () => {
         isOpen={isPanelOpen} 
         onClose={() => setPanelOpen(false)} 
         onOrderCreated={() => {
-            fetchOrders();
-            fetchRevenue();
+            refetchOrders();
+            refetchRevenue();
         }}
       />
     </main>
