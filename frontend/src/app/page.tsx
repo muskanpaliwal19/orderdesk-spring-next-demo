@@ -21,8 +21,12 @@ const OrdersPage: React.FC = () => {
       if (!res.ok) {
         throw new Error('Failed to fetch orders');
       }
-      const data: Order[] = await res.json();
-      setOrders(data);
+      const rawData = await res.json();
+      const transformedOrders: Order[] = rawData.map((order: any) => ({
+        ...order,
+        totalCents: order.totalCents || 0,
+      }));
+      setOrders(transformedOrders);
     } catch (err) {
         if(err instanceof Error) {
             setError(err.message);
