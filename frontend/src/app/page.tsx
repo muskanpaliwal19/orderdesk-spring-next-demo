@@ -5,17 +5,26 @@ import OrderSlidePanel from '../components/orders/OrderSlidePanel';
 import { Order } from '@/types/order';
 import OrderCard from '../components/OrderCard';
 import EmptyState from '../components/EmptyState';
+import RevenueStatCard from '../components/RevenueStatCard';
 
-const OrdersPage: React.FC = () => {
+interface RevenueData {
+  totalCents: number;
+}
+
+const DashboardPage: React.FC = () => {
   const [isPanelOpen, setPanelOpen] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoadingOrders, setIsLoadingOrders] = useState(true);
+  const [ordersError, setOrdersError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('');
 
+  const [revenueData, setRevenueData] = useState<RevenueData | null>(null);
+  const [isLoadingRevenue, setIsLoadingRevenue] = useState(true);
+  const [revenueError, setRevenueError] = useState<string | null>(null);
+
   const fetchOrders = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
+    setIsLoadingOrders(true);
+    setOrdersError(null);
     const url = statusFilter ? `/api/orders?status=${statusFilter}` : '/api/orders';
     try {
       const res = await fetch(url);
@@ -25,24 +34,65 @@ const OrdersPage: React.FC = () => {
       setOrders(await res.json());
     } catch (err) {
         if (err instanceof Error) {
-            setError(err.message);
+            setOrdersError(err.message);
         } else {
-            setError("An unknown error occurred.");
+            setOrdersError("An unknown error occurred.");
         }
     } finally {
-      setIsLoading(false);
+      setIsLoadingOrders(false);
     }
   }, [statusFilter]);
+
+  const fetchRevenue = async () => {
+    setIsLoadingRevenue(true);
+    setRevenueError(null);
+    try {
+        const res = await fetch('/api/reports/revenue');
+        if (!res.ok) {
+            throw new Error('Failed to fetch revenue data');
+        }
+        setRevenueData(await res.json());
+    } catch (err) {
+        if (err instanceof Error) {
+            setRevenueError(err.message);
+        } else {
+            setRevenueError("An unknown error occurred.");
+        }
+    } finally {
+        setIsLoadingRevenue(false);
+    }
+  };
 
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
 
+  useEffect(() => {
+    fetchRevenue();
+  }, []);
+
   return (
     <main className="max-w-5xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">Orders</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight">Dashboard</h1>
+          <p className="text-sm text-muted mt-0.5">An overview of your store's performance.</p>
+        </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-3 mb-8">
+        {isLoadingRevenue ? (
+            <div className="bg-white border border-line rounded-xl p-4 h-28 flex items-center justify-center"><p>Loading stats...</p></div>
+        ) : revenueError ? (
+            <div className="bg-white border border-destructive rounded-xl p-4 h-28 flex items-center justify-center"><p className="text-destructive">{revenueError}</p></div>
+        ) : revenueData && (
+            <RevenueStatCard totalCents={revenueData.totalCents} />
+        )}
+      </div>
+
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight">Orders</h2>
           <p className="text-sm text-muted mt-0.5">Manage and track customer orders</p>
         </div>
         <div className="flex items-center gap-4">
@@ -70,10 +120,10 @@ const OrdersPage: React.FC = () => {
         </div>
       </div>
 
-      {isLoading ? (
-        <div className=\"text-center py-16\"><p>Loading orders...</p></div>
-      ) : error ? (
-        <div className="text-red-500 text-center py-16">{error}</div>
+      {isLoadingOrders ? (
+        <div className="text-center py-16"><p>Loading orders...</p></div>
+      ) : ordersError ? (
+        <div className="text-red-500 text-center py-16">{ordersError}</div>
       ) : orders.length > 0 ? (
         <div className="grid gap-3">
           {orders.map((order) => (
@@ -87,10 +137,13 @@ const OrdersPage: React.FC = () => {
       <OrderSlidePanel 
         isOpen={isPanelOpen} 
         onClose={() => setPanelOpen(false)} 
-        onOrderCreated={fetchOrders}
+        onOrderCreated={() => {
+            fetchOrders();
+            fetchRevenue();
+        }}
       />
     </main>
   );
 };
 
-export default OrdersPage;
+export default DashboardPage;
