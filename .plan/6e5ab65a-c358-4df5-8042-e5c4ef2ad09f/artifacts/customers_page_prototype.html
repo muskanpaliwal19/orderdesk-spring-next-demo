@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OrderDesk — Customers</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+            surface: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1' },
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #f1f5f9; }
+  </style>
+</head>
+<body class="min-h-screen">
+  <div class="flex min-h-screen">
+    <aside class="w-56 bg-white border-r border-surface-200 flex flex-col">
+      <div class="p-5 border-b border-surface-200">
+        <h1 class="text-lg font-bold text-gray-900 tracking-tight">OrderDesk</h1>
+        <p class="text-xs text-gray-400 mt-0.5">Operations Portal</p>
+      </div>
+      <nav class="flex-1 p-3 space-y-1">
+        <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-surface-50 hover:text-gray-700 transition-colors duration-150">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+          Dashboard
+        </a>
+        <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm bg-brand-50 text-brand-700 font-medium">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Customers
+        </a>
+        <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-surface-50 hover:text-gray-700 transition-colors duration-150">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+          Products
+        </a>
+        <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-surface-50 hover:text-gray-700 transition-colors duration-150">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          Orders
+        </a>
+        <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-surface-50 hover:text-gray-700 transition-colors duration-150">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          Revenue
+        </a>
+      </nav>
+    </aside>
+    <main class="flex-1 p-8">
+      <div class="max-w-5xl mx-auto">
+        <div class="mb-6">
+          <h2 class="text-2xl font-bold text-gray-900">Customers</h2>
+          <p class="text-sm text-gray-500 mt-1">Register new customers and manage existing accounts</p>
+        </div>
+        <div id="errorBanner" class="hidden mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
+          <span id="errorText">Error message here</span>
+          <button onclick="hideError()" class="ml-auto text-red-400 hover:text-red-600">✕</button>
+        </div>
+        <div class="bg-white rounded-xl border border-surface-200 shadow-sm mb-6">
+          <div class="px-6 py-4 border-b border-surface-100">
+            <h3 class="font-semibold text-gray-900 text-sm">Register New Customer</h3>
+          </div>
+          <form id="customerForm" class="px-6 py-5">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1.5">Name <span class="text-red-400">*</span></label>
+                <input id="nameInput" type="text" placeholder="e.g. Jane Smith" required class="w-full px-3 py-2 border border-surface-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all duration-150 placeholder:text-gray-300">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1.5">Email <span class="text-red-400">*</span></label>
+                <input id="emailInput" type="email" placeholder="jane@company.com" required class="w-full px-3 py-2 border border-surface-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all duration-150 placeholder:text-gray-300">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1.5">Service Tier</label>
+                <select id="tierSelect" class="w-full px-3 py-2 border border-surface-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all duration-150 bg-white">
+                  <option value="standard">Standard</option>
+                  <option value="premium">Premium</option>
+                  <option value="enterprise">Enterprise</option>
+                </select>
+              </div>
+            </div>
+            <div class="mt-4 flex justify-end">
+              <button type="submit" class="px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500/30 transition-all duration-150 flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Add Customer
+              </button>
+            </div>
+          </form>
+        </div>
+        <div class="bg-white rounded-xl border border-surface-200 shadow-sm">
+          <div class="px-6 py-4 border-b border-surface-100 flex items-center justify-between">
+            <h3 class="font-semibold text-gray-900 text-sm">All Customers</h3>
+            <span id="countBadge" class="text-xs text-gray-400 bg-surface-50 px-2 py-0.5 rounded-full">3 customers</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="text-xs text-gray-500 uppercase tracking-wider border-b border-surface-100">
+                  <th class="text-left px-6 py-3 font-medium">Name</th>
+                  <th class="text-left px-6 py-3 font-medium">Email</th>
+                  <th class="text-left px-6 py-3 font-medium">Tier</th>
+                  <th class="text-left px-6 py-3 font-medium">Registered</th>
+                </tr>
+              </thead>
+              <tbody id="customerTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script>
+    const tierColors = {
+      standard:   { bg: 'bg-gray-100',   text: 'text-gray-700' },
+      premium:    { bg: 'bg-amber-50',    text: 'text-amber-700' },
+      enterprise: { bg: 'bg-purple-50',   text: 'text-purple-700' },
+    };
+    let customers = [
+      { id: 3, name: 'Maya Patel',  email: 'maya@example.com', tier: 'enterprise', createdAt: '2026-01-10T13:15:00Z' },
+      { id: 2, name: 'Noah Singh',  email: 'noah@example.com', tier: 'standard',   createdAt: '2026-01-08T10:30:00Z' },
+      { id: 1, name: 'Ava Chen',    email: 'ava@example.com',  tier: 'premium',    createdAt: '2026-01-04T09:00:00Z' },
+    ];
+    function renderCustomers() {
+      const tbody = document.getElementById('customerTable');
+      document.getElementById('countBadge').textContent = `${customers.length} customer${customers.length !== 1 ? 's' : ''}`;
+      tbody.innerHTML = customers.map(c => {
+        const colors = tierColors[c.tier] || tierColors.standard;
+        const date = new Date(c.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        return `<tr class="border-b border-surface-50 hover:bg-surface-50/50 transition-colors duration-100"><td class="px-6 py-3.5"><span class="text-sm font-medium text-gray-900">${c.name}</span></td><td class="px-6 py-3.5"><span class="text-sm text-gray-500">${c.email}</span></td><td class="px-6 py-3.5"><span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${colors.bg} ${colors.text} capitalize">${c.tier}</span></td><td class="px-6 py-3.5"><span class="text-sm text-gray-400">${date}</span></td></tr>`;
+      }).join('');
+    }
+    function showError(msg) {
+      document.getElementById('errorText').textContent = msg;
+      document.getElementById('errorBanner').classList.remove('hidden');
+    }
+    function hideError() {
+      document.getElementById('errorBanner').classList.add('hidden');
+    }
+    document.getElementById('customerForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      hideError();
+      const name = document.getElementById('nameInput').value.trim();
+      const email = document.getElementById('emailInput').value.trim();
+      const tier = document.getElementById('tierSelect').value;
+      if (!name || !email) { showError('Name and email are required.'); return; }
+      if (customers.some(c => c.email.toLowerCase() === email.toLowerCase())) { showError('A customer with this email already exists.'); return; }
+      customers.unshift({ id: customers.length + 1, name, email, tier, createdAt: new Date().toISOString() });
+      renderCustomers();
+      document.getElementById('customerForm').reset();
+    });
+    document.querySelectorAll('#customerForm input, #customerForm select').forEach(el => {
+      el.addEventListener('input', hideError);
+    });
+    renderCustomers();
+  </script>
+</body>
+</html>
