@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import OrderSlidePanel from '../components/orders/OrderSlidePanel';
 import StatusBadge from '../components/ui/StatusBadge';
-import { Order } from 'types/order';
+import { Order } from '@/types/order';
 
 const OrdersPage: React.FC = () => {
   const [isPanelOpen, setPanelOpen] = useState(false);

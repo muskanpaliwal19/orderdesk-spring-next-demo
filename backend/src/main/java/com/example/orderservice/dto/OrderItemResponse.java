@@ -17,7 +17,7 @@ public class OrderItemResponse {
                 orderItem.getId(),
                 orderItem.getProduct().getId(),
                 orderItem.getQuantity(),
-                orderItem.getUnitPrice()
+                new BigDecimal(orderItem.getUnitPriceCents()).movePointLeft(2)
         );
     }
 }
