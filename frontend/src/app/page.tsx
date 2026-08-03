@@ -6,16 +6,6 @@ import { Order } from '@/types/order';
 import OrderCard from '../components/OrderCard';
 import EmptyState from '../components/EmptyState';
 
-// This is the type we expect from the backend API
-interface OrderFromApi {
-  id: number;
-  customer: { name: string; email: string };
-  total: number;
-  status: string;
-  orderDate: string; // Assuming backend sends this
-  notes: string | null; // Assuming backend sends this
-}
-
 const OrdersPage: React.FC = () => {
   const [isPanelOpen, setPanelOpen] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -31,20 +21,8 @@ const OrdersPage: React.FC = () => {
       if (!res.ok) {
         throw new Error('Failed to fetch orders');
       }
-      const data: OrderFromApi[] = await res.json();
-      
-      // Transform the data to what our components expect
-      const transformedOrders: Order[] = data.map(order => ({
-        id: order.id,
-        customerName: order.customer.name,
-        customerEmail: order.customer.email,
-        status: order.status,
-        totalCents: Math.round(order.total * 100), // convert to cents
-        orderDate: order.orderDate,
-        notes: order.notes,
-      }));
-
-      setOrders(transformedOrders);
+      const data: Order[] = await res.json();
+      setOrders(data);
     } catch (err) {
         if(err instanceof Error) {
             setError(err.message);
