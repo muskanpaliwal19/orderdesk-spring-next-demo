@@ -8,7 +8,7 @@ import EmptyState from '../components/EmptyState';
 import RevenueStatCard from '../components/RevenueStatCard';
 
 interface RevenueData {
-  totalCents: number;
+  totalRevenue: number;
 }
 
 const DashboardPage: React.FC = () => {
@@ -86,7 +86,7 @@ const DashboardPage: React.FC = () => {
         ) : revenueError ? (
             <div className="bg-white border border-destructive rounded-xl p-4 h-28 flex items-center justify-center"><p className="text-destructive">{revenueError}</p></div>
         ) : revenueData && (
-            <RevenueStatCard totalCents={revenueData.totalCents} />
+            <RevenueStatCard totalCents={revenueData.totalRevenue * 100} />
         )}
       </div>
 
