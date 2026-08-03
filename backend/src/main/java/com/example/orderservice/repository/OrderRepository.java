@@ -13,26 +13,26 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT new com.example.orderservice.dto.OrderListItemDto(" +
             "o.id, " +
-            "c.name, " +
+            "COALESCE(c.name, \'Deleted Customer\'), " +
             "c.email, " +
             "o.status, " +
             "COALESCE(SUM(oi.quantity * oi.unitPriceCents), 0L), " +
             "o.orderDate, " +
             "o.notes) " +
-            "FROM Order o JOIN o.customer c LEFT JOIN o.orderItems oi " +
+            "FROM Order o LEFT JOIN o.customer c LEFT JOIN o.orderItems oi " +
             "GROUP BY o.id, c.name, c.email, o.status, o.orderDate, o.notes " +
             "ORDER BY o.orderDate DESC")
     List<OrderListItemDto> findAllOrdersWithTotals();
 
     @Query("SELECT new com.example.orderservice.dto.OrderListItemDto(" +
             "o.id, " +
-            "c.name, " +
+            "COALESCE(c.name, \'Deleted Customer\'), " +
             "c.email, " +
             "o.status, " +
             "COALESCE(SUM(oi.quantity * oi.unitPriceCents), 0L), " +
             "o.orderDate, " +
             "o.notes) " +
-            "FROM Order o JOIN o.customer c LEFT JOIN o.orderItems oi " +
+            "FROM Order o LEFT JOIN o.customer c LEFT JOIN o.orderItems oi " +
             "WHERE o.status = :status " +
             "GROUP BY o.id, c.name, c.email, o.status, o.orderDate, o.notes " +
             "ORDER BY o.orderDate DESC")
