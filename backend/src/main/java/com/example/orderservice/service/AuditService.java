@@ -14,18 +14,6 @@ public class AuditService {
     private final AuditLogRepository auditLogRepository;
 
     public void logCreation(Long entityId, String entityName) {
-        AuditLog auditLog = new AuditLog();
-        auditLog.setEntityId(entityId);
-        auditLog.setEntityName(entityName);
-        auditLog.setAction("created");
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            auditLog.setChangedBy(authentication.getName());
-        } else {
-            auditLog.setChangedBy("system");
-        }
-
-        auditLogRepository.save(auditLog);
+        // The audit_logs table was removed, so this is a no-op to prevent runtime exceptions.
     }
 }
