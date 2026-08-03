@@ -10,10 +10,6 @@ interface OrderSlidePanelProps {
 }
 
 const OrderSlidePanel: React.FC<OrderSlidePanelProps> = ({ isOpen, onClose, onOrderCreated }) => {
-  const handleOrderCreation = () => {
-    onOrderCreated();
-    onClose();
-  }
 
   return (
     <>
@@ -23,7 +19,7 @@ const OrderSlidePanel: React.FC<OrderSlidePanelProps> = ({ isOpen, onClose, onOr
       />
       <div
         className={`slide-panel ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        <CreateOrderForm onCancel={onClose} onCreate={handleOrderCreation} />
+        <CreateOrderForm onCancel={onClose} onOrderCreated={onOrderCreated} />
       </div>
     </>
   );
