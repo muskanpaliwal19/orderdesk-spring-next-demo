@@ -12,6 +12,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import com.example.orderservice.dto.OrderSummaryDto;
+import java.util.List;
+import java.util.Set;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -19,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController {
 
     private final OrderService orderService;
+    private static final Set<String> ALLOWED_STATUSES = Set.of("new", "paid", "shipped", "cancelled");
 
     @PostMapping
     public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request) {
@@ -26,5 +33,14 @@ public class OrderController {
         // Map entity to DTO
         OrderResponse orderResponse = OrderResponse.from(createdOrder);
         return new ResponseEntity<>(orderResponse, HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<OrderSummaryDto>> getOrders(@RequestParam(required = false) String status) {
+        if (status != null && !ALLOWED_STATUSES.contains(status.toLowerCase())) {
+            throw new IllegalArgumentException("Invalid status value. Allowed values are: new, paid, shipped, cancelled.");
+        }
+        List<OrderSummaryDto> orders = orderService.findAll(Optional.ofNullable(status));
+        return ResponseEntity.ok(orders);
     }
 }
