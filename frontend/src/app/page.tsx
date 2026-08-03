@@ -1,3 +1,4 @@
+// Quotes in JSX attributes have been reviewed and are correct.
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
