@@ -89,7 +89,7 @@
 
     function badge(status) {
       const s = statusStyles[status] || statusStyles.new;
-      return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide ring-1 ${s.bg} ${s.text} ${s.ring}">${status}</span>`;
+      return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide ring-1 ${s.bg} ${s.text} ${s.ring}">${escapeHTML(status)}</span>`;
     }
 
     function escapeHTML(str) {
