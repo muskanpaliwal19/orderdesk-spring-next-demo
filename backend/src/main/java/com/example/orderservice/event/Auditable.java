@@ -10,5 +10,6 @@ public interface Auditable {
     /**
      * @return A map of details about the event.
      */
+    String getEventName();
     Map<String, Object> getEventDetails();
 }
