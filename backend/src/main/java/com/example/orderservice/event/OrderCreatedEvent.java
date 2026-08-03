@@ -2,10 +2,14 @@ package com.example.orderservice.event;
 
 import com.example.orderservice.model.Order;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEvent;
 
 @Getter
-@RequiredArgsConstructor
-public class OrderCreatedEvent {
+public class OrderCreatedEvent extends ApplicationEvent {
     private final Order order;
+
+    public OrderCreatedEvent(Object source, Order order) {
+        super(source);
+        this.order = order;
+    }
 }
