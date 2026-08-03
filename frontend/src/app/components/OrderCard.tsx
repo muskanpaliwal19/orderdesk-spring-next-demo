@@ -28,7 +28,7 @@ const OrderCard = ({ order }: { order: Order }) => {
             day: 'numeric',
             year: 'numeric',
           }){' '}}
-          at{' '}
+          at{' '}}
           {new Date(order.orderDate).toLocaleTimeString('en-US', {
             hour: 'numeric',
             minute: '2-digit',
