@@ -120,8 +120,7 @@ public class OrderServiceTest {
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
             Order o = invocation.getArgument(0);
             o.setId(100L); // Set ID for audit log test
-            return o;
-        });
+            return o;\n        });
 
         Order result = orderService.createOrder(request);
 
@@ -152,7 +151,7 @@ public class OrderServiceTest {
         OrderItemRequest item2 = createItemRequest(3L, 1);
         CreateOrderRequest request = createRequest(List.of(item1, item2));
 
-        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(.customer));
         when(productRepository.findByIdInAndIsActiveTrue(List.of(1L, 3L))).thenReturn(List.of(activeProduct1));
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
