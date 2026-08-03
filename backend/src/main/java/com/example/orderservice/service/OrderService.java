@@ -7,7 +7,7 @@ import com.example.orderservice.model.AuditLog;
 import com.example.orderservice.model.Customer;
 import com.example.orderservice.model.Order;
 import com.example.orderservice.model.OrderItem;
-import com.example.orderservice.model.Product;
+import com.example.orderservice.model.OrderStatus;
 import com.example.orderservice.repository.AuditLogRepository;
 import com.example.orderservice.repository.CustomerRepository;
 import com.example.orderservice.repository.OrderItemRepository;
