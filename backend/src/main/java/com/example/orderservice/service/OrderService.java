@@ -1,4 +1,3 @@
-
 package com.example.orderservice.service;
 
 import com.example.orderservice.dto.CreateOrderRequest;
@@ -19,7 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +68,7 @@ public class OrderService {
                     OrderItem orderItem = new OrderItem();
                     orderItem.setProduct(product);
                     orderItem.setQuantity(itemRequest.getQuantity());
-                    orderItem.setUnitPriceCents(product.getPriceCents()); // Snapshot price
+                    orderItem.setUnitPrice(product.getPrice()); // Snapshot price
                     orderItem.setOrder(order);
                     return orderItem;
                 })
@@ -82,18 +81,18 @@ public class OrderService {
 
         order.setOrderItems(orderItems);
 
-        Integer totalAmountCents = orderItems.stream()
-                .map(item -> item.getUnitPriceCents() * item.getQuantity())
-                .reduce(0, Integer::sum);
-        order.setTotalAmountCents(totalAmountCents);
+        BigDecimal totalAmount = orderItems.stream()
+                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        order.setTotalAmount(totalAmount);
 
         Order savedOrder = orderRepository.save(order);
-
+        orderItemRepository.saveAll(orderItems);
+        
         AuditLog auditLog = new AuditLog();
-        auditLog.setEntityName("Order");
         auditLog.setEntityId(savedOrder.getId());
-        auditLog.setAction("CREATED");
-        auditLog.setChangedBy(customerId.toString());
+        auditLog.setEntityName("order");
+        auditLog.setAction("created");
         auditLogRepository.save(auditLog);
 
         return savedOrder;
