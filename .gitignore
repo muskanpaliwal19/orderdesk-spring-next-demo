@@ -1,0 +1,32 @@
+
+# >>> gallop publish hygiene >>>
+# Dependencies
+node_modules/
+
+# Temporary generated workdirs
+frontend-temp/
+*-temp/
+
+# Frontend build output
+.next/
+frontend/.next/
+frontend/out/
+frontend/dist/
+frontend/build/
+
+# Java build output
+target/
+backend/target/
+.gradle/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env files
+.env
+.env.*
+!.env.example
+# <<< gallop publish hygiene <<<
