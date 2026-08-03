@@ -22,6 +22,8 @@ public class AuditService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
             auditLog.setChangedBy(authentication.getName());
+        } else {
+            auditLog.setChangedBy("system");
         }
 
         auditLogRepository.save(auditLog);
