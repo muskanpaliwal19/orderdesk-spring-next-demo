@@ -68,7 +68,7 @@ public class OrderService {
                     OrderItem orderItem = new OrderItem();
                     orderItem.setProduct(product);
                     orderItem.setQuantity(itemRequest.getQuantity());
-                    orderItem.setUnitPrice(product.getPrice()); // Snapshot price
+                    orderItem.setUnitPriceCents(product.getPriceCents()); // Snapshot price
                     orderItem.setOrder(order);
                     return orderItem;
                 })
@@ -81,10 +81,10 @@ public class OrderService {
 
         order.setOrderItems(orderItems);
 
-        BigDecimal totalAmount = orderItems.stream()
-                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        order.setTotalAmount(totalAmount);
+        Integer totalAmount = orderItems.stream()
+                .mapToInt(item -> item.getUnitPriceCents() * item.getQuantity())
+                .sum();
+        order.setTotalAmountCents(totalAmount);
 
         Order savedOrder = orderRepository.save(order);
         orderItemRepository.saveAll(orderItems);
