@@ -44,7 +44,7 @@ public class OrderService {
             throw new IllegalArgumentException("Order must contain at least one item.");
         }
 
-        Long customerId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        Long customerId =  Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new EntityNotFoundException("Customer not found with id: " + customerId));
 
