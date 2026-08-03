@@ -1,15 +1,1 @@
-package com.example.orderservice.dto;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import lombok.Data;
-
-import java.util.List;
-
-@Data
-public class CreateOrderRequest {
-
-    @Valid
-    @NotEmpty(message = "Order must have at least one item")
-    private List<OrderItemRequest> items;
-}
+package com.example.orderservice.dto;\n\nimport jakarta.validation.Valid;\nimport jakarta.validation.constraints.NotEmpty;\nimport lombok.Data;\n\nimport java.util.List;\n\n@Data\npublic class CreateOrderRequest {\n\n    @Valid\n    @NotEmpty(message = \"Order must have at least one item\")\n    private List<OrderItemRequest> items;\n}\n
