@@ -1,41 +1,24 @@
+
 package com.example.orderservice.repository;
 
-import com.example.orderservice.dto.OrderListItemDto;
 import com.example.orderservice.model.Order;
 import com.example.orderservice.model.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    @Query("SELECT new com.example.orderservice.dto.OrderListItemDto(" +
-            "o.id, " +
-            "COALESCE(c.name, 'Deleted Customer'), " +
-            "COALESCE(c.email, ''), " +
-            "o.status, " +
-            "COALESCE(SUM(oi.quantity * oi.unitPriceCents), 0L), " +
-            "o.orderDate, " +
-            "o.notes) " +
-            "FROM Order o LEFT JOIN o.customer c LEFT JOIN o.orderItems oi " +
-            "GROUP BY o.id, c.name, c.email, o.status, o.orderDate, o.notes " +
-            "ORDER BY o.orderDate DESC")
-    List<OrderListItemDto> findAllOrdersWithTotals();
+    @Query(value = "SELECT CAST(o.order_date AS DATE) as order_day, SUM(o.total_price) as daily_revenue FROM orders o GROUP BY CAST(o.order_date AS DATE)", nativeQuery = true)
+    List<Object[]> findDailyRevenue();
 
-    @Query("SELECT new com.example.orderservice.dto.OrderListItemDto(" +
-            "o.id, " +
-            "COALESCE(c.name, 'Deleted Customer'), " +
-            "COALESCE(c.email, ''), " +
-            "o.status, " +
-            "COALESCE(SUM(oi.quantity * oi.unitPriceCents), 0L), " +
-            "o.orderDate, " +
-            "o.notes) " +
-            "FROM Order o LEFT JOIN o.customer c LEFT JOIN o.orderItems oi " +
-            "WHERE o.status = :status " +
-            "GROUP BY o.id, c.name, c.email, o.status, o.orderDate, o.notes " +
-            "ORDER BY o.orderDate DESC")
-    List<OrderListItemDto> findOrdersByStatusWithTotals(@Param("status") OrderStatus status);
+    @Query("SELECT o FROM Order o JOIN FETCH o.customer JOIN FETCH o.orderItems i JOIN FETCH i.product ORDER BY o.orderDate DESC")
+    List<Order> findAllOrdersWithTotals();
+
+    @Query("SELECT o FROM Order o JOIN FETCH o.customer JOIN FETCH o.orderItems i JOIN FETCH i.product WHERE o.status = :status ORDER BY o.orderDate DESC")
+    List<Order> findOrdersByStatusWithTotals(OrderStatus status);
 }
 

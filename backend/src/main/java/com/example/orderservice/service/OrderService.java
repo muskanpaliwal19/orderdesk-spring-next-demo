@@ -2,6 +2,7 @@ package com.example.orderservice.service;
 
 import com.example.orderservice.dto.CreateOrderRequest;
 import com.example.orderservice.dto.OrderItemRequest;
+import com.example.orderservice.dto.OrderMapper;
 import com.example.orderservice.dto.OrderListItemDto;
 import com.example.orderservice.event.OrderCreatedEvent;
 import com.example.orderservice.model.Customer;
@@ -23,7 +24,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -91,10 +92,10 @@ public class OrderService {
     }
 
     public List<OrderListItemDto> findAllOrders() {
-        return orderRepository.findAllOrdersWithTotals();
+        return orderRepository.findAllOrdersWithTotals().stream().map(OrderMapper::toDto).collect(Collectors.toList());
     }
 
     public List<OrderListItemDto> findOrdersByStatus(OrderStatus status) {
-        return orderRepository.findOrdersByStatusWithTotals(status);
+        return orderRepository.findOrdersByStatusWithTotals(status).stream().map(OrderMapper::toDto).collect(Collectors.toList());
     }
 }
