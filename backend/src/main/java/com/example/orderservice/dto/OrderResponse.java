@@ -23,7 +23,7 @@ public class OrderResponse {
                 order.getCustomer().getId(),
                 order.getOrderDate(),
                 new BigDecimal(order.getTotalAmountCents()).movePointLeft(2),
-                order.getStatus(),
+                order.getStatus().name(),
                 order.getOrderItems().stream()
                         .map(OrderItemResponse::from)
                         .collect(Collectors.toList())

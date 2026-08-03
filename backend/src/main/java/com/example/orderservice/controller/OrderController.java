@@ -2,7 +2,7 @@ package com.example.orderservice.controller;
 
 import com.example.orderservice.dto.CreateOrderRequest;
 import com.example.orderservice.dto.OrderResponse;
-import com.example.orderservice.dto.OrderResponse;\nimport com.example.orderservice.model.Order;
+import com.example.orderservice.model.Order;
 import com.example.orderservice.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
