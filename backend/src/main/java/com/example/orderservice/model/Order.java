@@ -32,8 +32,9 @@ public class Order {
     @Column(name = "total_amount_cents", nullable = false)
     private Integer totalAmountCents;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status;
+    private OrderStatus status;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
