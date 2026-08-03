@@ -11,7 +11,7 @@ public class StringToOrderStatusConverter implements Converter<String, OrderStat
     @Override
     public OrderStatus convert(String source) {
         return Arrays.stream(OrderStatus.values())
-                .filter(status -> status.name().equalsIgnoreCase(source))
+                .filter(status -> status.getValue().equalsIgnoreCase(source))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unknown status: " + source));
     }
