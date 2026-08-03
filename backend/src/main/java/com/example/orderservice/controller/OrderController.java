@@ -23,6 +23,7 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request) {
         Order createdOrder = orderService.createOrder(request);
+        // Map entity to DTO
         OrderResponse orderResponse = OrderResponse.from(createdOrder);
         return new ResponseEntity<>(orderResponse, HttpStatus.CREATED);
     }
