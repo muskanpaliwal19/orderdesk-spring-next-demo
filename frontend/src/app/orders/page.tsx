@@ -95,6 +95,12 @@ export default function OrdersPage() {
          <div className="text-center py-16">
             <p className="text-muted text-sm">Loading orders...</p>
          </div>
+      ) : error ? (
+        <div className="text-center py-16">
+          <div className="text-4xl mb-3">😞</div>
+          <p className="font-semibold text-red-600">Failed to load orders</p>
+          <p className="text-muted text-sm mt-2">{error}</p>
+        </div>
       ) : orders.length === 0 ? (
         <div id="emptyState" className="text-center py-16">
           <div className="text-4xl mb-3">📦</div>

@@ -2,7 +2,7 @@ package com.example.orderservice.service;
 
 import com.example.orderservice.dto.CreateOrderRequest;
 import com.example.orderservice.dto.OrderItemRequest;
-import com.example.orderservice.dto.OrderSummaryDto;
+import com.example.orderservice.dto.OrderListItemDto;
 import com.example.orderservice.event.OrderCreatedEvent;
 import com.example.orderservice.model.Customer;
 import com.example.orderservice.model.Order;
@@ -24,13 +24,12 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -76,7 +75,7 @@ public class OrderService {
                     orderItem.setOrder(order);
                     return orderItem;
                 })
-                .filter(java.util.Objects::nonNull)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         if (orderItems.isEmpty()) {
@@ -93,24 +92,16 @@ public class OrderService {
         Order savedOrder = orderRepository.save(order);
         orderItemRepository.saveAll(orderItems);
 
-        eventPublisher.publishEvent(new OrderCreatedEvent(savedOrder));
+        eventPublisher.publishEvent(new OrderCreatedEvent(this, savedOrder));
 
         return savedOrder;
     }
 
-    public List<OrderSummaryDto> findAll(Optional<String> status) {
-        return status.map(this::mapStatusToEnum)
-                .map(orderRepository::findOrderSummariesByStatus)
-                .orElseGet(orderRepository::findAllOrderSummaries);
+    public List<OrderListItemDto> findAllOrders() {
+        return orderRepository.findAllOrdersWithTotals();
     }
 
-    private OrderStatus mapStatusToEnum(String status) {
-        return switch (status.toLowerCase()) {
-            case "new" -> OrderStatus.CREATED;
-            case "paid" -> OrderStatus.PENDING;
-            case "shipped" -> OrderStatus.SHIPPED;
-            case "cancelled" -> OrderStatus.CANCELLED;
-            default -> throw new IllegalArgumentException("Invalid status: " + status);
-        };
+    public List<OrderListItemDto> findOrdersByStatus(OrderStatus status) {
+        return orderRepository.findOrdersByStatusWithTotals(status);
     }
 }
