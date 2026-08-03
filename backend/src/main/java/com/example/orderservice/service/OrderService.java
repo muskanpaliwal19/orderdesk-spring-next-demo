@@ -87,15 +87,15 @@ public class OrderService {
                 .reduce(0, Integer::sum);
         order.setTotalAmountCents(totalAmountCents);
 
-        orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
 
         AuditLog auditLog = new AuditLog();
         auditLog.setEntityName("Order");
-        auditLog.setEntityId(order.getId());
+        auditLog.setEntityId(savedOrder.getId());
         auditLog.setAction("CREATED");
         auditLog.setChangedBy(customerId.toString());
         auditLogRepository.save(auditLog);
 
-        return order;
+        return savedOrder;
     }
 }
