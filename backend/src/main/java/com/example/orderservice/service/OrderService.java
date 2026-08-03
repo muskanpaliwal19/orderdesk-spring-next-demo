@@ -1,9 +1,14 @@
+
 package com.example.orderservice.service;
 
 import com.example.orderservice.dto.CreateOrderRequest;
-import com.example.orderservice.model.*;
-import com.example.orderservice.repository.AuditLogRepository;
+import com.example.orderservice.dto.OrderItemRequest;
+import com.example.orderservice.model.Customer;
+import com.example.orderservice.model.Order;
+import com.example.orderservice.model.OrderItem;
+import com.example.orderservice.model.Product;
 import com.example.orderservice.repository.CustomerRepository;
+import com.example.orderservice.repository.OrderItemRepository;
 import com.example.orderservice.repository.OrderRepository;
 import com.example.orderservice.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -12,8 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,46 +28,51 @@ import java.util.stream.Collectors;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
-    private final AuditLogRepository auditLogRepository;
 
     @Transactional
     public Order createOrder(CreateOrderRequest request) {
+        if (request.getItems() == null || request.getItems().isEmpty()) {
+            throw new IllegalArgumentException("Order must contain at least one item.");
+        }
+
         Customer customer = customerRepository.findById(request.getCustomerId())
                 .orElseThrow(() -> new EntityNotFoundException("Customer not found with id: " + request.getCustomerId()));
 
         List<Long> productIds = request.getItems().stream()
-                .map(item -> item.getProductId())
-                .collect(Collectors.toList());
+                .map(OrderItemRequest::getProductId)
+                .toList();
 
-        List<Product> activeProducts = productRepository.findByIdInAndIsActiveTrue(productIds);
+        List<Product> products = productRepository.findAllById(productIds);
 
-        if (activeProducts.isEmpty()) {
-            throw new IllegalArgumentException("No valid products found in the order.");
-        }
-
-        Map<Long, Product> activeProductMap = activeProducts.stream()
-                .collect(Collectors.toMap(Product::getId, product -> product));
+        Map<Long, Product> productMap = products.stream()
+                .collect(Collectors.toMap(Product::getId, Function.identity()));
 
         Order order = new Order();
         order.setCustomer(customer);
-        order.setStatus("new");
+        order.setOrderDate(OffsetDateTime.now());
+        order.setStatus("CREATED");
 
         List<OrderItem> orderItems = request.getItems().stream()
-                .filter(item -> activeProductMap.containsKey(item.getProductId()))
                 .map(itemRequest -> {
-                    Product product = activeProductMap.get(itemRequest.getProductId());
+                    Product product = productMap.get(itemRequest.getProductId());
+                    if (product == null || !product.isActive()) {
+                        return null; // Will be filtered out later
+                    }
                     OrderItem orderItem = new OrderItem();
                     orderItem.setProduct(product);
-                    orderItem.setOrder(order);
                     orderItem.setQuantity(itemRequest.getQuantity());
-                    orderItem.setUnitPrice(product.getUnitPrice()); // AC2: Snapshotting unit price
+                    orderItem.setUnitPrice(product.getPrice()); // Snapshot price
+                    orderItem.setOrder(order);
                     return orderItem;
-                }).collect(Collectors.toList());
+                })
+                .filter(java.util.Objects::nonNull)
+                .collect(Collectors.toList());
 
         if (orderItems.isEmpty()) {
-            throw new IllegalArgumentException("No valid products found in the order.");
+            throw new IllegalArgumentException("No active products found to create order.");
         }
 
         order.setOrderItems(orderItems);
@@ -70,15 +82,9 @@ public class OrderService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         order.setTotalAmount(totalAmount);
 
-        Order savedOrder = orderRepository.save(order);
+        orderRepository.save(order);
+        orderItemRepository.saveAll(orderItems);
 
-        // AC5: Create an audit log entry
-        AuditLog auditLog = new AuditLog();
-        auditLog.setOrderId(savedOrder.getId());
-        auditLog.setStatus(savedOrder.getStatus());
-        auditLog.setNotes("Order created");
-        auditLogRepository.save(auditLog);
-
-        return savedOrder;
+        return order;
     }
 }
