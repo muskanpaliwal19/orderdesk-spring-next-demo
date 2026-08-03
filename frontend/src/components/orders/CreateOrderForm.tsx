@@ -29,6 +29,9 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onCancel, onOrderCrea
           fetch('/api/customers'),
           fetch('/api/products'),
         ]);
+        if (!customersRes.ok || !productsRes.ok) {
+          throw new Error('Failed to fetch initial data');
+        }
         const customersData = await customersRes.json();
         const productsData = await productsRes.json();
         setCustomers(customersData);
