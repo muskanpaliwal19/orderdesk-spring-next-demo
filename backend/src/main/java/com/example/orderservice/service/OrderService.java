@@ -1,24 +1,24 @@
-package com.example.orderservice.service;
+package com.example.orderservice.service;\n\nimport com.example.orderservice.model.OrderStatus;
 
 import com.example.orderservice.dto.CreateOrderRequest;
 import com.example.orderservice.dto.OrderItemRequest;
-import com.example.orderservice.dto.OrderSummaryDto;
-import com.example.orderservice.model.AuditLog;
+import com.example.orderservice.event.OrderCreatedEvent;
 import com.example.orderservice.model.Customer;
 import com.example.orderservice.model.Order;
 import com.example.orderservice.model.OrderItem;
-import com.example.orderservice.model.OrderStatus;
-import com.example.orderservice.repository.AuditLogRepository;
+import com.example.orderservice.model.Product;
 import com.example.orderservice.repository.CustomerRepository;
 import com.example.orderservice.repository.OrderItemRepository;
 import com.example.orderservice.repository.OrderRepository;
 import com.example.orderservice.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +33,7 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
-    private final AuditLogRepository auditLogRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Order createOrder(CreateOrderRequest request) {
@@ -68,7 +68,7 @@ public class OrderService {
                     OrderItem orderItem = new OrderItem();
                     orderItem.setProduct(product);
                     orderItem.setQuantity(itemRequest.getQuantity());
-                    orderItem.setUnitPriceCents(product.getPriceCents()); // Snapshot price
+                    orderItem.setUnitPrice(product.getPrice()); // Snapshot price
                     orderItem.setOrder(order);
                     return orderItem;
                 })
@@ -81,30 +81,16 @@ public class OrderService {
 
         order.setOrderItems(orderItems);
 
-        Integer totalAmountCents = orderItems.stream()
-                .mapToInt(item -> item.getUnitPriceCents() * item.getQuantity())
-                .sum();
-        order.setTotalAmountCents(totalAmountCents);
+        BigDecimal totalAmount = orderItems.stream()
+                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        order.setTotalAmount(totalAmount);
 
         Order savedOrder = orderRepository.save(order);
+        orderItemRepository.saveAll(orderItems);
 
-        
-        AuditLog auditLog = new AuditLog();
-        auditLog.setEntityId(savedOrder.getId());
-        auditLog.setEntityName("order");
-        auditLog.setAction("created");
-        auditLogRepository.save(auditLog);
+        eventPublisher.publishEvent(new OrderCreatedEvent(savedOrder));
 
         return savedOrder;
-    }
-
-    @Transactional(readOnly = true)
-    public List<OrderSummaryDto> getAllOrderSummaries() {
-        return orderRepository.findAllOrderSummaries();
-    }
-
-    @Transactional(readOnly = true)
-    public List<OrderSummaryDto> getOrderSummariesByStatus(String status) {
-        return orderRepository.findOrderSummariesByStatus(status);
     }
 }
