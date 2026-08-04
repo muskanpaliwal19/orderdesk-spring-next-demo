@@ -1,10 +1,38 @@
 {
   "services": {
-    "frontend": { "cwd": "./frontend", "cmd": "npx", "args": ["next", "dev", "--port", "3000"], "port": 3000 },
-    "backend": { "cwd": "./backend", "cmd": "./mvnw", "args": ["spring-boot:run", "-Dspring-boot.run.arguments=--server.port=8080"], "port": 8080, "healthCheck": { "path": "/api/health", "timeoutSeconds": 180 } }
+    "frontend": {
+      "cwd": "./frontend",
+      "cmd": "npx",
+      "args": [
+        "next",
+        "dev",
+        "--port",
+        "3000"
+      ],
+      "port": 3000
+    },
+    "backend": {
+      "cwd": "./backend",
+      "cmd": "./mvnw",
+      "args": [
+        "spring-boot:run",
+        "-Dspring-boot.run.arguments=--server.port=8080"
+      ],
+      "port": 8080,
+      "healthCheck": {
+        "path": "/api/health",
+        "timeoutSeconds": 180
+      }
+    }
   },
   "routes": {
-    "/api": { "service": "backend", "stripPrefix": false },
-    "/": { "service": "frontend", "stripPrefix": false }
+    "/api": {
+      "service": "backend",
+      "stripPrefix": false
+    },
+    "/": {
+      "service": "frontend",
+      "stripPrefix": false
+    }
   }
 }
