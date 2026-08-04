@@ -17,7 +17,11 @@ public class AuditLog {
 
     private String eventType;
 
-    private String eventDetails;
+    private String entityType;
+
+    private String entityId;
+
+    private String message;
 
     private LocalDateTime createdAt;
 
@@ -37,12 +41,28 @@ public class AuditLog {
         this.eventType = eventType;
     }
 
-    public String getEventDetails() {
-        return eventDetails;
+    public String getEntityType() {
+        return entityType;
     }
 
-    public void setEventDetails(String eventDetails) {
-        this.eventDetails = eventDetails;
+    public void setEntityType(String entityType) {
+        this.entityType = entityType;
+    }
+
+    public String getEntityId() {
+        return entityId;
+    }
+
+    public void setEntityId(String entityId) {
+        this.entityId = entityId;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public LocalDateTime getCreatedAt() {
