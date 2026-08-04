@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MockMvc;\nimport java.math.BigDecimal;
 
 import java.util.Collections;
 
@@ -28,7 +28,7 @@ class ProductControllerIntegrationTest {
     @MockBean
     private ProductService productService;
 
-    private Product createProduct(Long id, String name, String category, String description, double price) {
+    private Product createProduct(Long id, String name, String category, String description, BigDecimal price) {
         Product p = new Product(name, description, price, category);
         p.setId(id);
         return p;
@@ -36,7 +36,7 @@ class ProductControllerIntegrationTest {
 
     @Test
     void getSimilarProducts_shouldReturnSimilarProducts() throws Exception {
-        Product similarProduct = createProduct(2L, "Similar Product", "Test", "Test desc", 10.0);
+        Product similarProduct = createProduct(2L, "Similar Product", "Test", "Test desc", BigDecimal.valueOf(10.0));
         given(productService.getSimilarProducts(1L)).willReturn(Collections.singletonList(similarProduct));
 
         mockMvc.perform(get("/api/products/1/similar"))
