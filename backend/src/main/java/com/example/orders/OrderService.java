@@ -1,6 +1,9 @@
 
 package com.example.orders;
 
+import com.example.audit.AuditLog;
+import com.example.audit.AuditLogRepository;
+
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -9,9 +12,11 @@ import java.util.Optional;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final AuditLogRepository auditLogRepository;
 
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, AuditLogRepository auditLogRepository) {
         this.orderRepository = orderRepository;
+        this.auditLogRepository = auditLogRepository;
     }
 
     public Order createOrder(Order order) {
@@ -26,6 +31,7 @@ public class OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
         order.setStatus(status);
+        auditLogRepository.save(new AuditLog(id, status.toString(), "status_changed"));
         return orderRepository.save(order);
     }
 }
