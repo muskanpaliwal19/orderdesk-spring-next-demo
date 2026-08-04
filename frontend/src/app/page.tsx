@@ -26,7 +26,7 @@ const DashboardPage: React.FC = () => {
       </div>
 
       <div className=\"grid gap-4 md:grid-cols-3 mb-8\">
-        <RevenueStatCard totalCents={revenueData?.totalRevenue} isLoading={isLoadingRevenue} isError={!!revenueError} />
+        <RevenueStatCard totalRevenue={revenueData?.totalRevenue} isLoading={isLoadingRevenue} isError={!!revenueError} />
       </div>
 
       <div className=\"flex items-center justify-between mb-6\">

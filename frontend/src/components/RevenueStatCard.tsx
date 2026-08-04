@@ -2,17 +2,16 @@
 import React from 'react';
 
 interface RevenueStatCardProps {
-  totalCents?: number;
+  totalRevenue?: number;
   isLoading: boolean;
   isError: boolean;
 }
 
-const formatCurrency = (cents: number): string => {
-  const dollars = cents / 100;
+const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-  }).format(dollars);
+  }).format(value);
 };
 
 const DollarIcon = () => (
@@ -33,7 +32,7 @@ const DollarIcon = () => (
   );
 
 const RevenueStatCard: React.FC<RevenueStatCardProps> = ({
-  totalCents,
+  totalRevenue,
   isLoading,
   isError,
 }) => {
@@ -51,12 +50,12 @@ const RevenueStatCard: React.FC<RevenueStatCardProps> = ({
       {isError && (
         <p className="text-3xl font-bold text-red-600">Error</p>
       )}
-      {!isLoading && !isError && totalCents !== undefined && (
+      {!isLoading && !isError && totalRevenue !== undefined && (
         <p className="text-3xl font-bold text-gray-900">
-          {formatCurrency(totalCents)}
+          {formatCurrency(totalRevenue)}
         </p>
       )}
-       {!isLoading && !isError && totalCents === undefined && (
+       {!isLoading && !isError && totalRevenue === undefined && (
          <p className="text-3xl font-bold text-gray-900">-</p>
       )}
     </div>
