@@ -1,5 +1,6 @@
 package com.example.auditlog.service;
 
+import com.example.auditlog.AuditEventType;
 import com.example.auditlog.jpa.AuditLog;
 import com.example.auditlog.repository.AuditLogRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -29,13 +30,13 @@ public class AuditLogService {
         return auditLogRepository.findTop50ByOrderByCreatedAtDesc();
     }
 
-    public void logEvent(String eventType, Map<String, Object> eventDetailsMap) {
+    public void logEvent(AuditEventType eventType, Map<String, Object> eventDetailsMap) {
         AuditLog auditLog = new AuditLog();
-        auditLog.setEventType(eventType);
+        auditLog.setEventType(eventType.name());
         try {
             auditLog.setMessage(objectMapper.writeValueAsString(eventDetailsMap));
         } catch (JsonProcessingException e) {
-            logger.error("Failed to serialize audit event details for event type {}", eventType, e);
+            logger.error("Failed to serialize audit event details for event type {}", eventType.name(), e);
             auditLog.setMessage("{\"error\":\"Failed to serialize event details\"}");
         }
         auditLog.setCreatedAt(LocalDateTime.now());
