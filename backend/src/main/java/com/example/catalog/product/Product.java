@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "products")
@@ -15,13 +16,13 @@ public class Product {
     private Long id;
     private String name;
     private String description;
-    private double price;
+    private BigDecimal price;
     private String category;
 
     public Product() {
     }
 
-    public Product(String name, String description, double price, String category) {
+    public Product(String name, String description, BigDecimal price, String category) {
         this.name = name;
         this.description = description;
         this.price = price;
@@ -52,11 +53,11 @@ public class Product {
         this.description = description;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
