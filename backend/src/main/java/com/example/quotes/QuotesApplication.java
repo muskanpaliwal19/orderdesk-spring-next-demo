@@ -1,13 +1,13 @@
-package com.example.catalog;
+package com.example.quotes;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CatalogApplication {
+public class QuotesApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CatalogApplication.class, args);
+        SpringApplication.run(QuotesApplication.class, args);
     }
 
 }
