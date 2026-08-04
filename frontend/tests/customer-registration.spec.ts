@@ -79,4 +79,30 @@ test.describe('Customer Registration', () => {
     // Check that the form was not cleared
     await expect(page.getByTestId('name-input')).toHaveValue('Second User');
   });
+
+  test('should show an error if name is empty', async ({ page }) => {
+    await page.goto('/customers');
+
+    // Fill out the form with empty name
+    await page.getByTestId('email-input').fill('test@example.com');
+    await page.getByTestId('submit-button').click();
+
+    // Check for the error message from backend validation
+    const errorBanner = page.locator('div[role="alert"]');
+    await expect(errorBanner).toBeVisible();
+    await expect(errorBanner).toContainText('Name is mandatory');
+  });
+
+  test('should show an error if email is empty', async ({ page }) => {
+    await page.goto('/customers');
+
+    // Fill out the form with empty email
+    await page.getByTestId('name-input').fill('Test User');
+    await page.getByTestId('submit-button').click();
+
+    // Check for the error message from backend validation
+    const errorBanner = page.locator('div[role="alert"]');
+    await expect(errorBanner).toBeVisible();
+    await expect(errorBanner).toContainText('Email is mandatory');
+  });
 });

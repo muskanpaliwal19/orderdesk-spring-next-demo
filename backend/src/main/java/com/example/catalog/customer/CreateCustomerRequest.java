@@ -1,7 +1,7 @@
 package com.example.catalog.customer;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;\nimport jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
 public class CreateCustomerRequest {
 
@@ -28,7 +28,7 @@ public class CreateCustomerRequest {
         this.email = email;
     }
 
-    @NotNull(message = \"Tier is mandatory\")\n    private CustomerTier tier;
+    private CustomerTier tier;
 
     public CustomerTier getTier() {
         return tier;
