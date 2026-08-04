@@ -1,78 +1,66 @@
 # AGENTS.md
 
+## Overall Architecture
+- Build a two-tier monolith: a Spring Boot REST API backend and a Next.js SPA frontend.
+- The backend runs on port 8080 and the frontend on port 3000.
+- Communication is exclusively via HTTP/JSON.
+- Do NOT use microservices, message queues, or event buses.
+
 ## Tech Stack
+- **Backend:** Java 21, Spring Boot 3.x
+- **Build Tool:** Maven with Maven Wrapper (`./mvnw`)
+- **Web:** Spring Boot Starter Web (synchronous)
+- **Persistence:** Spring Data JPA + Hibernate
+- **Database:** PostgreSQL
+- **Migrations:** Flyway. Place SQL migration files in `src/main/resources/db/migration/`.
+- **Frontend:** Next.js 14+ with TypeScript (App Router)
+- **Styling:** Tailwind CSS
+- **Package Manager:** npm
 
-### Backend
-- Language: Java 21
-- Framework: Spring Boot 3.x (latest stable)
-- Build Tool: Maven with Maven Wrapper (`./mvnw`)
-- Web Layer: Spring Boot Starter Web (synchronous)
-- Persistence: Spring Data JPA with Hibernate
-- Database: PostgreSQL
-- Migrations: Flyway
-- Validation: Spring Boot Starter Validation (Jakarta Bean Validation)
-- Boilerplate: Lombok (`@Data`, `@Builder`, `@NoArgsConstructor`, `@AllArgsConstructor`) for JPA entities.
+## Backend
+- Use a layered architecture with packages organized by technical function:
+  - `com.orderdesk.controller` (REST controllers)
+  - `com.orderdesk.service` (Business logic)
+  - `com.orderdesk.repository` (Spring Data JPA interfaces)
+  - `com.orderdesk.model` (JPA entities)
+  - `com.orderdesk.dto` (Request/response DTOs)
+  - `com.orderdesk.config` (Security, CORS, etc.)
+- Use Lombok (`@Data`, `@Builder`) for JPA entities in the `model` package.
+- Use Java records for immutable DTOs in the `dto` package.
+- Implement a health check endpoint (e.g., `/actuator/health`).
 
-### Frontend
-- Framework: Next.js 14+ with TypeScript
-- Package Manager: npm
-- Styling: Tailwind CSS
-- State Management: Use React `useState` and `useEffect` only.
-- Data Fetching: Use browser `fetch` with relative paths.
-- Do NOT use a global state library (e.g., Redux, Jotai).
-- Do NOT use an extra HTTP client library (e.g., Axios).
+## Frontend
+- Implement as a client-side single-page application (SPA).
+- All Next.js pages must use the `'use client'` directive.
+- Data fetching must use the standard `fetch` API with `useState`/`useEffect`.
+- All API calls must use relative paths (e.g., `fetch('/api/orders')`).
+- **Do NOT** use Next.js API routes. The Spring Boot backend owns the entire `/api` surface.
+- **Do NOT** use Server-Side Rendering (SSR) or Next.js Server Components.
+- **Do NOT** add a global state management library (e.g., Redux, Jotai). Use component-local state.
+- **Do NOT** add an external data fetching library (e.g., Axios, SWR).
 
-## Architecture
-
-### Overall
-- A two-tier monolith:
-    - Backend: Spring Boot REST API running on port 8080.
-    - Frontend: Next.js Single-Page Application (SPA) running on port 3000.
-- Communication is via HTTP/JSON.
-
-### Backend Structure
-- Use a layered architecture with the following package structure:
-    - `com.orderdesk.controller`: REST controllers. Handle HTTP concerns only.
-    - `com.orderdesk.service`: Business logic.
-    - `com.orderdesk.repository`: Spring Data JPA interfaces.
-    - `com.orderdesk.model`: JPA entities. Use Lombok for boilerplate.
-    - `com.orderdesk.dto`: Data Transfer Objects. Use Java records.
-    - `com.orderdesk.config`: Spring configuration (e.g., CORS, Security).
-
-### Frontend Structure
-- Implement as a Client-Side Rendered (CSR) SPA.
-- All pages must use the `'use client'` directive.
-- Fetch data from the backend using relative paths (e.g., `fetch('/api/orders')`).
-- Do NOT use Next.js server components or SSR features.
-- Do NOT implement any API routes in the Next.js application. The Spring Boot app owns the entire `/api` surface.
-
-## API & Data Model
-
-- Prefix all API endpoints with `/api`.
+## API & Data
+- All API endpoints must be prefixed with `/api`.
 - Use RESTful conventions: `GET` for reads, `POST` for creates, `PATCH` for updates.
 - Use JSON for all request and response bodies.
-- Decouple API contracts from the database model:
-    - Use Java records for DTOs in the `dto` package.
-    - Use JPA classes with Lombok annotations for entities in the `model` package.
-- The 5 core database tables are: `customers`, `products`, `orders`, `order_items`, `audit_logs`.
-- Use `integer` cents for all monetary values.
-- Order statuses are restricted to: `new`, `paid`, `shipped`, `cancelled`.
-- Snapshot product prices in `order_items` at the time of order creation.
+- The PostgreSQL schema must contain these tables: `customers`, `products`, `orders`, `order_items`, `audit_logs`.
+- Use integer cents for all monetary values.
+- Order item prices must be snapshotted in the `order_items` table at the time of order creation.
+- The `status` field in the `orders` table must only contain one of these values: `new`, `paid`, `shipped`, `cancelled`.
+- Recreate the `order_totals` report as a PostgreSQL view or a backend service method.
 
-## Security
-- Use Spring Security to protect all backend API endpoints.
-- Implement server-side input validation on all DTOs using Jakarta Bean Validation annotations (`@NotNull`, `@NotBlank`, etc.).
-- The backend must reject requests with invalid order status transitions.
-- Implement audit logging for order creation and status changes into the `audit_logs` table.
-- Do NOT commit credentials or secrets.
+## Security & Validation
+- Use Spring Security to protect all API endpoints.
+- Use Jakarta Bean Validation (`@NotNull`, `@NotBlank`, etc.) on DTOs for all incoming requests.
+- Implement server-side validation for all business rules, especially order status transitions.
+- Log order creation and status changes to the `audit_logs` table.
+- **Do NOT** commit credentials or secrets to the repository.
 
-## Testing & NFRs
-- Implement a backend health check endpoint (e.g., via Spring Boot Actuator).
-- Backend unit tests are required for all service layer business logic (order creation, status updates, revenue calculation).
-- Backend integration tests should hit a real database instance for repository logic.
-- Frontend smoke tests are required for critical user flows (viewing orders, filtering by status, viewing revenue).
-- Use Flyway for all database schema migrations. Place scripts in `src/main/resources/db/migration/`.
-- Provide sample seed data via a Flyway migration for local development and testing.
+## Testing
+- Write backend integration tests for business logic (customer/order creation, status updates, revenue calculation).
+- Tests should connect to a real PostgreSQL database (e.g., using Testcontainers).
+- Write frontend smoke tests for critical user flows (viewing orders, filtering, viewing reports).
+- Include seed data to populate the database for local development and testing.
 
 ## Agent Identity & Confidentiality (Non-Negotiable)
 
