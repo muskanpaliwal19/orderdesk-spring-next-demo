@@ -27,7 +27,7 @@ public class AuditLogService {
     }
 
     public List<AuditLog> getRecentAuditLogs() {
-        return auditLogRepository.findTop50ByOrderByCreatedAtDesc();
+        return auditLogRepository.findAll(PageRequest.of(0, 50, Sort.by(Sort.Direction.DESC, "createdAt"))).getContent();
     }
 
     public void logEvent(AuditEventType eventType, Map<String, Object> eventDetailsMap) {
