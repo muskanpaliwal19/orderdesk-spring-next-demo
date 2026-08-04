@@ -17,7 +17,7 @@ public class CustomerService {
     }
 
     public List<Customer> getAllCustomers() {
-        return customerRepository.findAll();
+        return customerRepository.findAllByOrderByCreatedAtDesc();
     }
 
     public Customer createCustomer(CreateCustomerRequest request) {
