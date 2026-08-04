@@ -7,7 +7,10 @@ async function getCustomers(): Promise<{ customers: Customer[]; error: string | 
     const res = await fetch('http://localhost:3000/api/customers', { cache: 'no-store' });
 
     if (!res.ok) {
-      return { customers: [], error: 'Failed to fetch customers.' };
+      // Per customer feedback, we're now parsing the JSON body of the error response.
+      // This provides more specific details about why the request failed.
+      const errorData = await res.json();
+      return { customers: [], error: errorData.message || 'Failed to fetch customers.' };
     }
 
     return { customers: await res.json(), error: null };
