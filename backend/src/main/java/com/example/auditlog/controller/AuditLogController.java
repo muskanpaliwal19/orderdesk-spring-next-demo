@@ -1,0 +1,27 @@
+package com.example.auditlog.controller;
+
+import com.example.auditlog.jpa.AuditLog;
+import com.example.auditlog.service.AuditLogService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/audit-logs")
+public class AuditLogController {
+
+    private final AuditLogService auditLogService;
+
+    @Autowired
+    public AuditLogController(AuditLogService auditLogService) {
+        this.auditLogService = auditLogService;
+    }
+
+    @GetMapping
+    public List<AuditLog> getRecentAuditLogs() {
+        return auditLogService.getRecentAuditLogs();
+    }
+}
