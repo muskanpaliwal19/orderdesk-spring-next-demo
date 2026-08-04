@@ -51,7 +51,7 @@ public class OrderController {
             try {
                 orderStatus = OrderStatus.valueOf(status.toUpperCase());
             } catch (IllegalArgumentException e) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid status: " + status);
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid status value");
                 return;
             }
         }
