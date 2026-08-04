@@ -1,0 +1,45 @@
+migration:
+  build_datasets: ["ods"]
+  steps:
+    # 1. Target table, populated by "Flyway" logic.
+    # We are expressing this logic in a way the validation harness understands (BQ-like SQL).
+    - ddl:
+        sql: |
+          CREATE TABLE ${DS_ODS}.quotes (id INT64, text STRING, author STRING);
+    - transform:
+        sql: |
+          INSERT INTO ${DS_ODS}.quotes (id, text, author) VALUES
+          (1, 'The journey of a thousand miles begins with a single step.', 'Lao Tzu'),
+          (2, 'That''s one small step for a man, one giant leap for mankind.', 'Neil Armstrong'),
+          (3, 'You miss 100% of the shots you don''t take.', 'Wayne Gretzky');
+
+    # 2. Source table, populated from CSV data, for comparison.
+    - ddl:
+        sql: |
+          CREATE TABLE ${TEMP_DATASET}.quotes_source (id INT64, text STRING, author STRING);
+    - transform:
+        sql: |
+          INSERT INTO ${TEMP_DATASET}.quotes_source (id, text, author) VALUES
+          (1, 'The journey of a thousand miles begins with a single step.', 'Lao Tzu'),
+          (2, 'That''s one small step for a man, one giant leap for mankind.', 'Neil Armstrong'),
+          (3, 'You miss 100% of the shots you don''t take.', 'Wayne Gretzky');
+suites:
+  - pattern: schema_conformance
+    target_dataset: ${DS_ODS}
+    expect_table_count: 1
+    tables:
+      - table: quotes
+        expect_object_type: TABLE
+        columns:
+          - { name: id, type: INT64, nullable: true }
+          - { name: text, type: STRING, nullable: true }
+          - { name: author, type: STRING, nullable: true }
+  - pattern: rowcount_parity
+    source: { table: ${TEMP_DATASET}.quotes_source }
+    target: { table: ${DS_ODS}.quotes }
+    expect_exact: true
+  - pattern: fingerprint_parity
+    source: { table: ${TEMP_DATASET}.quotes_source }
+    target: { table: ${DS_ODS}.quotes }
+    columns: ["id", "text", "author"]
+    key_columns: ["id"]
