@@ -1,5 +1,5 @@
 
-package com.example.quotes;
+package com.example.orders;
 
 public enum OrderStatus {
     NEW,
