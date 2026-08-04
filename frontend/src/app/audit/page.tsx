@@ -1,15 +1,12 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
 
 interface AuditLog {
   id: number;
-  entityType: string;
-  entityId: number;
   eventType: string;
-  message: string;
   createdAt: string;
+  eventDetails: string;
 }
 
 function eventBadge(eventType: string) {
@@ -20,10 +17,6 @@ function eventBadge(eventType: string) {
   const style = styles[eventType] || 'bg-gray-50 text-gray-700 border-gray-200';
   const label = eventType.replace('_', ' ');
   return <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${style}`}>{label}</span>;
-}
-
-function entityBadge(type: string) {
-  return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700">{type}</span>;
 }
 
 function formatTimestamp(iso: string) {
@@ -40,7 +33,7 @@ function formatTimestamp(iso: string) {
 
 export default function AuditTrailPage() {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(.true);
 
   useEffect(() => {
     async function fetchAuditLogs() {
@@ -71,32 +64,26 @@ export default function AuditTrailPage() {
           <thead className="bg-surface-50">
             <tr>
               <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Timestamp</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Entity Type</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Entity ID</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Event</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Message</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Details</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-surface-100">
             {loading ? (
               <tr>
-                <td colSpan={5} className="p-4 text-center text-gray-500">Loading...</td>
+                <td colSpan={3} className="p-4 text-center text-gray-500">Loading...</td>
               </tr>
             ) : auditLogs.length > 0 ? (
               auditLogs.map((entry) => (
                 <tr key={entry.id} className="hover:bg-surface-50 transition-colors">
                   <td className="px-4 py-3 whitespace-nowrap">{formatTimestamp(entry.createdAt)}</td>
-                  <td className="px-4 py-3 whitespace-nowrap">{entityBadge(entry.entityType)}</td>
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <span className="text-sm font-mono text-gray-700">#{entry.entityId}</span>
-                  </td>
                   <td className="px-4 py-3 whitespace-nowrap">{eventBadge(entry.eventType)}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{entry.message}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{entry.eventDetails}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="p-4 text-center text-gray-500">No audit trail entries found.</td>
+                <td colSpan={3} className="p-4 text-center text-gray-500">No audit trail entries found.</td>
               </tr>
             )}
           </tbody>
