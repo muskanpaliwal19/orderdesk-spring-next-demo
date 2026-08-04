@@ -45,11 +45,11 @@ public class OrderService {
 
         for (OrderExportRow order : orders) {
             writer.println(
-                    order.getOrderId() + "," +
-                            order.getCustomerEmail() + "," +
-                            order.getStatus() + "," +
-                            order.getOrderDate() + "," +
-                            order.getTotalAmount()
+                    order.id() + "," +
+                            order.customerEmail() + "," +
+                            order.status() + "," +
+                            order.orderDate() + "," +
+                            (order.totalCents() / 100.0)
             );
         }
     }
