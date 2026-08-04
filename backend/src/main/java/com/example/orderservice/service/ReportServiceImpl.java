@@ -22,15 +22,20 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public RevenueReportDto getRevenueReport() {
-        List<Object[]> results = orderRepository.findDailyRevenue();
-        List<RevenueReportDto.RevenueByDate> revenueByDateList = results.stream()
+        List<Object[]> dailyRevenueResults = orderRepository.findDailyRevenue();
+        List<RevenueReportDto.RevenueByDate> revenueByDateList = dailyRevenueResults.stream()
                 .map(result -> new RevenueReportDto.RevenueByDate(((java.sql.Date) result[0]).toLocalDate(), (BigDecimal) result[1]))
                 .collect(Collectors.toList());
 
         BigDecimal totalRevenue = revenueByDateList.stream()
-                .map(RevenueReportDto.RevenueByDate::getRevenue)
+                .map(RevenueReportDto.RevenueByDate::revenue)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return new RevenueReportDto(revenueByDateList, totalRevenue);
+        List<Object[]> revenueByStatusResults = orderRepository.findRevenueByStatus();
+        List<RevenueReportDto.RevenueByStatus> revenueByStatusList = revenueByStatusResults.stream()
+                .map(result -> new RevenueReportDto.RevenueByStatus((String) result[0], ((Number) result[1]).longValue(), (BigDecimal) result[2]))
+                .collect(Collectors.toList());
+
+        return new RevenueReportDto(revenueByDateList, totalRevenue, revenueByStatusList);
     }
 }

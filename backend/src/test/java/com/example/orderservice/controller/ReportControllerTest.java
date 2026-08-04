@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -17,11 +18,6 @@ import java.util.Collections;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -35,10 +31,12 @@ public class ReportControllerTest {
     private ReportService reportService;
 
     @Test
+    @WithMockUser
     public void getRevenueReport_shouldReturnRevenueReport() throws Exception {
         LocalDate date = LocalDate.of(2023, 1, 1);
         RevenueReportDto.RevenueByDate revenueByDate = new RevenueReportDto.RevenueByDate(date, new BigDecimal("100.00"));
-        RevenueReportDto revenueReportDto = new RevenueReportDto(Collections.singletonList(revenueByDate), new BigDecimal("100.00"));
+        RevenueReportDto.RevenueByStatus revenueByStatus = new RevenueReportDto.RevenueByStatus("PENDING", 1L, new BigDecimal("100.00"));
+        RevenueReportDto revenueReportDto = new RevenueReportDto(Collections.singletonList(revenueByDate), new BigDecimal("100.00"), Collections.singletonList(revenueByStatus));
 
         when(reportService.getRevenueReport()).thenReturn(revenueReportDto);
 
@@ -46,6 +44,9 @@ public class ReportControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalRevenue").value(100.00))
                 .andExpect(jsonPath("$.revenueByDate[0].date").value("2023-01-01"))
-                .andExpect(jsonPath("$.revenueByDate[0].revenue").value(100.00));
+                .andExpect(jsonPath("$.revenueByDate[0].revenue").value(100.00))
+                .andExpect(jsonPath("$.revenueByStatus[0].status").value("PENDING"))
+                .andExpect(jsonPath("$.revenueByStatus[0].orderCount").value(1))
+                .andExpect(jsonPath("$.revenueByStatus[0].revenue").value(100.00));
     }
 }

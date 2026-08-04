@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.OffsetDateTime;
@@ -30,6 +31,7 @@ public class OrderControllerTest {
     private OrderService orderService;
 
     @Test
+    @WithMockUser
     public void getOrders_noStatus_returnsAllOrders() throws Exception {
         OrderListItemDto order = new OrderListItemDto(1L, "Test Customer", "test@test.com", OrderStatus.NEW, 10000L, OffsetDateTime.now(), "notes");
 
@@ -43,6 +45,7 @@ public class OrderControllerTest {
     }
 
     @Test
+    @WithMockUser
     public void getOrders_withValidStatus_returnsFilteredOrders() throws Exception {
         OrderListItemDto order = new OrderListItemDto(1L, "Test Customer", "test@test.com", OrderStatus.NEW, 10000L, OffsetDateTime.now(), "notes");
 
@@ -55,12 +58,14 @@ public class OrderControllerTest {
     }
 
     @Test
+    @WithMockUser
     public void getOrders_withInvalidStatus_returnsBadRequest() throws Exception {
         mockMvc.perform(get("/api/orders").param("status", "invalid"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
+    @WithMockUser
     public void getOrders_withValidStatus_returnsEmptyList() throws Exception {
         when(orderService.findOrdersByStatus(OrderStatus.SHIPPED)).thenReturn(Collections.emptyList());
 

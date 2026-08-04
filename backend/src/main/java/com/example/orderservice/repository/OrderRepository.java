@@ -15,6 +15,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query(value = "SELECT CAST(o.order_date AS DATE) as order_day, SUM(o.total_amount_cents) as daily_revenue FROM orders o GROUP BY CAST(o.order_date AS DATE)", nativeQuery = true)
     List<Object[]> findDailyRevenue();
 
+    @Query(value = "SELECT o.status, COUNT(o.id), SUM(o.total_amount_cents) FROM orders o GROUP BY o.status", nativeQuery = true)
+    List<Object[]> findRevenueByStatus();
+
     @Query("SELECT o FROM Order o JOIN FETCH o.customer ORDER BY o.orderDate DESC")
     List<Order> findAllOrdersWithTotals();
 
