@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import { Customer } from "@/types/customer";
 
 interface CustomerFormProps {
-  onCustomerAdded: () => void;
+  onCustomerAdded: (customer: Customer) => void;
   onError: (message: string) => void;
 }
 
@@ -31,9 +32,10 @@ export default function CustomerForm({ onCustomerAdded, onError }: CustomerFormP
         throw new Error(errorData.message || "Failed to add customer");
       }
 
+      const newCustomer = await response.json();
+      onCustomerAdded(newCustomer);
       setName("");
       setEmail("");
-      onCustomerAdded();
     } catch (error) {
         if (error instanceof Error) {
             onError(error.message);
