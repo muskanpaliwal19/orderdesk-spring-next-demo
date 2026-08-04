@@ -29,7 +29,7 @@ public class CustomerService {
         Customer newCustomer = new Customer();
         newCustomer.setName(request.getName());
         newCustomer.setEmail(request.getEmail());
-        newCustomer.setTier(CustomerTier.BASIC); // Default tier
+        newCustomer.setTier(request.getTier() == null ? CustomerTier.STANDARD : request.getTier());
 
         return customerRepository.save(newCustomer);
     }

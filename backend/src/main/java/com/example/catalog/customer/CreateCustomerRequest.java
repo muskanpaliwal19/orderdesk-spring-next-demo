@@ -27,4 +27,14 @@ public class CreateCustomerRequest {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    private CustomerTier tier;
+
+    public CustomerTier getTier() {
+        return tier;
+    }
+
+    public void setTier(CustomerTier tier) {
+        this.tier = tier;
+    }
 }
