@@ -25,12 +25,12 @@ management:
         include: health
   endpoint:
     health:
-      show-details: always
+      show-details: when-authorized
 ```
 
 - **`base-path: /api`** — places the health endpoint at `/api/health`, matching both the legacy route and the preview manifest's `healthCheck.path`.
 - **`exposure.include: health`** — only the health endpoint is exposed; no other actuator endpoints are accessible.
-- **`show-details: always`** — returns component-level status (database connectivity, disk space) so operators can diagnose issues beyond "app is up."
+- **`show-details: when-authorized`** — returns component-level status (database connectivity, disk space) to authorized users. This prevents exposing sensitive details to the public.
 
 ### What It Provides
 The auto-configured **DataSource health indicator** (activated by Spring Data JPA on the classpath) runs a lightweight validation query against PostgreSQL on every health check. No custom code needed.
