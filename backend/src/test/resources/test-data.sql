@@ -15,11 +15,12 @@ INSERT INTO customers (id, name, email, created_at, updated_at) VALUES
 (1, 'Test Customer 1', 'test1@customer.com', NOW(), NOW()),
 (2, 'Test Customer 2', 'test2@customer.com', NOW(), NOW());
 
-INSERT INTO products (id, name, description, price_cents, is_active, created_at, updated_at) VALUES 
-(1, 'Product A', 'Test Product A', 1999, true, NOW(), NOW()),
-(2, 'Product B', 'Test Product B', 2999, true, NOW(), NOW()),
-(3, 'Product C', 'Test Product C', 4000, true, NOW(), NOW()),
-(4, 'Product D', 'Test Product D', 4994, true, NOW(), NOW());
+INSERT INTO products (id, name, description, price_cents, is_active, created_at, updated_at, category, sku) VALUES 
+(1, 'Product A', 'Test Product A', 1999, true, NOW(), NOW(), 'cat1', 'SKU1'),
+(2, 'Product B', 'Test Product B', 2999, true, NOW(), NOW(), 'cat1', 'SKU2'),
+(3, 'Product C', 'Test Product C', 4000, true, NOW(), NOW(), 'cat2', 'SKU3'),
+(4, 'Product D', 'Test Product D', 4994, true, NOW(), NOW(), 'cat2', 'SKU4'),
+(5, 'Product E', 'Test Product E', 5995, false, NOW(), NOW(), 'cat1', 'SKU5');
 
 -- Order 1: NEW
 INSERT INTO orders (id, customer_id, order_date, total_amount_cents, status, created_at, updated_at)

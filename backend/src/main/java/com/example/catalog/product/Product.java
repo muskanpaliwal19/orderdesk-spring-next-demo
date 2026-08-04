@@ -21,6 +21,9 @@ public class Product {
     private String category;
     @Column(name = "is_active")
     private boolean isActive;
+    @Column(unique = true)
+    private String sku;
+
 
     public Product() {
     }
@@ -79,5 +82,13 @@ public class Product {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public String getSku() {
+        return sku;
+    }
+
+    public void setSku(String sku) {
+        this.sku = sku;
     }
 }

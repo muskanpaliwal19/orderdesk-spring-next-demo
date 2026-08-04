@@ -22,7 +22,7 @@ const LineItemRow: React.FC<LineItemRowProps> = ({ products, item, onItemChange,
         <option value="">Select product...</option>
         {products.map((product) => (
           <option key={product.id} value={product.id}>
-            {product.name}
+            {product.name} ({product.sku}) - ${product.price.toFixed(2)}
           </option>
         ))}
       </select>

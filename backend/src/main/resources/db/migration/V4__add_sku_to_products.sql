@@ -1,0 +1,4 @@
+ALTER TABLE products ADD COLUMN sku VARCHAR(255);
+UPDATE products SET sku = 'SKU-' || id WHERE sku IS NULL;
+ALTER TABLE products ALTER COLUMN sku SET NOT NULL;
+ALTER TABLE products ADD CONSTRAINT unique_sku UNIQUE (sku);
