@@ -7,6 +7,7 @@ import com.example.catalog.product.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.math.BigDecimal;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,12 +19,21 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public List<ProductDto> getSimilarProducts(Long id) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException("Product not found."));
-
-        return productRepository.findByCategoryAndIdNot(product.getCategory(), id).stream()
-                .map(p -> new ProductDto(p.getId(), p.getName(), p.getDescription(), p.getPrice(), p.getCategory()))
+    public List<ProductDto> getProducts() {
+        return productRepository.findAllByIsActiveTrue()
+                .stream()
+                .map(this::convertToDto)
                 .collect(Collectors.toList());
+    }
+
+    private ProductDto convertToDto(Product product) {
+        BigDecimal price = BigDecimal.valueOf(product.getUnitPriceCents()).divide(BigDecimal.valueOf(100));
+        return new ProductDto(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                price,
+                product.getCategory()
+        );
     }
 }

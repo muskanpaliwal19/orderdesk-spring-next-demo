@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 
 @Entity
 @Table(name = "products")
@@ -15,17 +16,21 @@ public class Product {
     private Long id;
     private String name;
     private String description;
+    @Column(name = "price_cents")
     private Integer unitPriceCents;
     private String category;
+    @Column(name = "is_active")
+    private boolean isActive;
 
     public Product() {
     }
 
-    public Product(String name, String description, Integer unitPriceCents, String category) {
+    public Product(String name, String description, Integer unitPriceCents, String category, boolean isActive) {
         this.name = name;
         this.description = description;
         this.unitPriceCents = unitPriceCents;
         this.category = category;
+        this.isActive = isActive;
     }
 
     public Long getId() {
@@ -66,5 +71,13 @@ public class Product {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }

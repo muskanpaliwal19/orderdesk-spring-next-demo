@@ -20,8 +20,8 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @GetMapping("/{id}/similar")
-    public ResponseEntity<List<ProductDto>> getSimilarProducts(@PathVariable Long id) {
-        return ResponseEntity.ok(productService.getSimilarProducts(id));
+    @GetMapping
+    public ResponseEntity<List<ProductDto>> getProducts() {
+        return ResponseEntity.ok(productService.getProducts());
     }
 }
