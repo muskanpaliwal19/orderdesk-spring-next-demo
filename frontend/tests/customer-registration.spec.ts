@@ -1,0 +1,50 @@
+
+import { test, expect } from '@playwright/test';
+
+test.describe('Customer Registration', () => {
+  test('should allow a user to register a new customer', async ({ page }) => {
+    await page.goto('/customers');
+
+    // Fill out the form
+    const uniqueEmail = `testuser_${Date.now()}@example.com`;
+    await page.getByTestId('name-input').fill('Test User');
+    await page.getByTestId('email-input').fill(uniqueEmail);
+
+    // Submit the form
+    await page.getByTestId('submit-button').click();
+
+    // Wait for the form to clear and the customer to appear in the table
+    await expect(page.getByTestId('name-input')).toBeEmpty();
+    await expect(page.getByTestId('email-input')).toBeEmpty();
+
+    // Check that the new customer is in the table
+    await expect(page.locator(`tr:has-text("Test User") and :has-text("${uniqueEmail}")`)).toBeVisible();
+  });
+
+  test('should show an error message when registration fails', async ({ page }) => {
+    // Intercept the API request and force a failure
+    await page.route('/api/customers', route => {
+      route.fulfill({
+        status: 400,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'Invalid customer data' }),
+      });
+    });
+
+    await page.goto('/customers');
+
+    // Fill out the form
+    await page.getByTestId('name-input').fill('Error User');
+    await page.getByTestId('email-input').fill('error@example.com');
+
+    // Submit the form
+    await page.getByTestId('submit-button').click();
+
+    // Check for the error message
+    await expect(page.locator('div[role="alert"]')).toBeVisible();
+    await expect(page.locator('div[role="alert"]')).toContainText('Invalid customer data');
+
+    // The form should not have been cleared
+    await expect(page.getByTestId('name-input')).toHaveValue('Error User');
+  });
+});
