@@ -1,69 +1,66 @@
 # AGENTS.md
 
 ## Tech Stack
-- **Backend**: Java 21, Spring Boot 3.x (Web, Data JPA, Validation), Maven with Wrapper (`./mvnw`).
-- **Database**: PostgreSQL.
-- **Database Migrations**: Flyway. Place migration scripts in `src/main/resources/db/migration/`.
-- **Frontend**: Next.js 14+ with TypeScript and App Router.
-- **Frontend Styling**: Tailwind CSS.
-- **Frontend Package Manager**: npm. Do NOT use Yarn or pnpm.
-- **JSON Serialization**: Jackson (default in Spring Web).
-- **Boilerplate Reduction**: Use Lombok for JPA entities (`@Data`, `@Builder`, `@NoArgsConstructor`, `@AllArgsConstructor`).
+- **Backend:** Java 21 with Spring Boot 3.x
+- **Frontend:** Next.js 14+ with TypeScript
+- **Database:** PostgreSQL, with migrations managed by Flyway
+- **Build Tools:** Maven with wrapper (`./mvnw`) for backend, `npm` for frontend
 
 ## Architecture
-- **Overall**: Two-tier monolithic application.
-- **Backend**: Spring Boot REST API running on port 8080.
-- **Frontend**: Next.js Single Page Application (SPA) running on port 3000.
-- **Communication**: Frontend calls the backend via HTTP/JSON.
+- A two-tier monolith: a Spring Boot REST API backend and a Next.js Single-Page Application (SPA) frontend.
+- Communication is exclusively HTTP/JSON.
+- Do NOT use microservices, event buses, or message queues.
 
-## Backend
-- **Structure**: Use a layered architecture with packages organized by technical function:
-    - `com.orderdesk.controller`: REST controllers. Handle HTTP concerns only.
-    - `com.orderdesk.service`: Business logic.
-    - `com.orderdesk.repository`: Spring Data JPA interfaces for data access.
-    - `com.orderdesk.model`: JPA entities. Use Lombok for boilerplate.
-    - `com.orderdesk.dto`: Data Transfer Objects. Use Java records.
-    - `com.orderdesk.config`: Application and security configuration.
-- **Health Check**: Implement a health check endpoint.
-- **Build**: Use the Maven Wrapper (`./mvnw`) for all builds.
+## Backend (Spring Boot)
+- **Project Structure:** Use a standard layered architecture:
+    - `com.orderdesk.controller`: REST controllers for handling HTTP and validation.
+    - `com.orderdesk.service`: Business logic (order processing, reporting).
+    - `com.orderdesk.repository`: Data access interfaces using Spring Data JPA.
+    - `com.orderdesk.model`: JPA entities. Use Lombok (`@Data`, `@Builder`).
+    - `com.orderdesk.dto`: Data Transfer Objects. Use Java Records.
+- **API:**
+    - Expose all endpoints under the `/api` prefix.
+    - Follow RESTful conventions (e.g., `GET /api/orders`, `POST /api/orders`).
+    - Use Spring Boot Starter Validation (`@NotNull`, etc.) on DTOs for input validation.
+- **Persistence:**
+    - Use Spring Data JPA and Hibernate.
+    - Place Flyway migration scripts in `src/main/resources/db/migration/`.
+- **Security:**
+    - Protect all API endpoints with Spring Security.
+    - Implement server-side validation for all inputs, especially order status transitions.
+    - Implement audit logging for order creation and status changes into the `audit_logs` table.
+- **Health:** Provide a health check endpoint.
 
-## Frontend
-- **Rendering**: Client-side rendering only. All pages and components must use the `'use client'` directive.
-- **Data Fetching**: Use the browser's `fetch` API with `useState` and `useEffect` hooks.
-- **API Calls**: All API calls must use relative paths (e.g., `/api/orders`), not absolute URLs.
-- **State Management**: Use only component-local state (`useState`). Do NOT add a global state management library like Redux or Jotai.
-- **Routing**: Use the Next.js App Router for client-side navigation.
-- **API Routes**: Do NOT use Next.js API routes. The Spring Boot application owns the entire API surface.
+## Frontend (Next.js)
+- **Rendering:** All pages must be client-side rendered. Use `'use client'` at the top of every page file.
+- **Data Fetching:**
+    - Use the standard browser `fetch` API and React hooks (`useState`, `useEffect`).
+    - All API calls must use relative paths (e.g., `fetch('/api/customers')`).
+    - Do NOT use Next.js Server Components, server actions, or API Routes (Route Handlers).
+- **State Management:**
+    - Use only component-local state with `useState`.
+    - Do NOT add a global state management library (e.g., Redux, Zustand, Jotai).
+- **Styling:** Use Tailwind CSS for all styling.
 
-## API Contract
-- **Prefix**: All API endpoints must be prefixed with `/api`.
-- **Format**: Use JSON for all request and response bodies.
-- **Conventions**: Adhere to RESTful principles (e.g., `GET` for reads, `POST` for creates, `PATCH` for updates).
-
-## Data Model & Migrations
-- **Tables**: Create the following 5 tables using Flyway migrations: `customers`, `products`, `orders`, `order_items`, `audit_logs`.
-- **Relationships**: Enforce foreign key constraints between tables.
-- **Monetary Values**: Store all monetary values (e.g., prices) as integer cents.
-- **Order Status**: Order status must be a string with one of the following values: `new`, `paid`, `shipped`, `cancelled`.
-- **Reporting**: Recreate the `order_totals` view either as a PostgreSQL view or a backend service query.
-- **Data Seeding**: Provide seed data equivalent to the legacy application for validation.
-
-## Security
-- **Authentication**: Use Spring Security to protect all backend REST endpoints.
-- **Validation**: Implement server-side input validation on all DTOs using Jakarta Bean Validation (`@NotNull`, `@NotBlank`, etc.). Reject invalid order status transitions and malformed payloads.
-- **Audit**: Log all order creation and status change events to the `audit_logs` table.
+## Database & Data Model
+- **Schema:**
+    - The schema must contain five tables: `customers`, `products`, `orders`, `order_items`, and `audit_logs`.
+    - Enforce foreign key relationships.
+- **Data Types:**
+    - Store all monetary values as integer cents.
+- **Constraints:**
+    - The `status` column in the `orders` table must only contain one of these values: `new`, `paid`, `shipped`, `cancelled`.
+- **Reporting:**
+    - Create a PostgreSQL view or a backend service method to generate revenue totals (`order_totals`).
+- **Data Seeding:** Include seed data in a Flyway migration to populate the database for testing.
 
 ## Testing
-- **Backend**: Write unit/integration tests for:
-    - Customer and order creation.
-    - Order status updates.
-    - Revenue calculation logic.
-    - Input validation failures.
-- **Frontend**: Write smoke tests for critical user flows:
-    - Viewing customers and orders.
-    - Filtering orders by status.
-    - Viewing the revenue report.
-- **Assertions**: Tests must assert business outcomes and data integrity, not just endpoint availability. Validate against seed data where appropriate.
+- **Backend:**
+    - Write unit tests for all business logic in service classes.
+    - Write integration tests for JPA repositories to verify persistence logic.
+- **Frontend:**
+    - Implement basic smoke tests for critical user flows: viewing orders, filtering by status, and viewing the revenue report.
+- **Fixtures:** All tests should use seed data that allows for validation of business rules and revenue calculations.
 
 ## Agent Identity & Confidentiality (Non-Negotiable)
 
