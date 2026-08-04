@@ -70,6 +70,13 @@ export default function OrdersPage() {
     fetchOrders();
   }, [statusFilter]);
 
+  const handleExport = () => {
+    const url = statusFilter
+      ? `/api/orders/export?status=${statusFilter.toUpperCase()}`
+      : '/api/orders/export';
+    window.location.href = url;
+  };
+
   return (
     <main className="max-w-5xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
@@ -77,18 +84,26 @@ export default function OrdersPage() {
           <h1 className="text-2xl font-extrabold tracking-tight">Orders</h1>
           <p className="text-sm text-muted mt-0.5">Manage and track customer orders</p>
         </div>
-        <select
-          id="statusFilter"
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="border border-line rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand/30 cursor-pointer"
-        >
-          <option value="">All statuses</option>
-          <option value="NEW">New</option>
-          <option value="PAID">Paid</option>
-          <option value="SHIPPED">Shipped</option>
-          <option value="CANCELLED">Cancelled</option>
-        </select>
+        <div className="flex items-center gap-4">
+          <select
+            id="statusFilter"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="border border-line rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand/30 cursor-pointer"
+          >
+            <option value="">All statuses</option>
+            <option value="NEW">New</option>
+            <option value="PAID">Paid</option>
+            <option value="SHIPPED">Shipped</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
+          <button
+            onClick={handleExport}
+            className="bg-brand text-white font-semibold px-4 py-2.5 rounded-xl text-sm hover:bg-brand/90 transition-colors focus:outline-none focus:ring-2 focus:ring-brand/50"
+          >
+            Export CSV
+          </button>
+        </div>
       </div>
 
       {loading ? (
