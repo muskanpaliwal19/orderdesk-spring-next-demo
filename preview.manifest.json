@@ -20,13 +20,17 @@
       ],
       "port": 8080,
       "healthCheck": {
-        "path": "/api/health",
+        "path": "/actuator/health",
         "timeoutSeconds": 180
       }
     }
   },
   "routes": {
     "/api": {
+      "service": "backend",
+      "stripPrefix": false
+    },
+    "/actuator": {
       "service": "backend",
       "stripPrefix": false
     },
