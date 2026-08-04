@@ -34,7 +34,6 @@ Call log:
         - /url: /customers
 - main:
   - heading "Customers" [level=1]
-  - alert: "Failed to execute 'json' on 'Response': Unexpected end of JSON input"
   - heading "Add New Customer" [level=2]
   - text: Name
   - textbox "Name"
@@ -52,7 +51,11 @@ Call log:
         - columnheader "Name"
         - columnheader "Email"
         - columnheader "Tier"
-    - rowgroup
+    - rowgroup:
+      - row "Test Customer test@example.com STANDARD":
+        - cell "Test Customer"
+        - cell "test@example.com"
+        - cell "STANDARD"
 - region "Notifications alt+T"
 - alert
 ```

@@ -33,8 +33,8 @@ export default function CustomersPage() {
   }, []);
 
   const handleCustomerAdded = (newCustomer: Customer) => {
-    setCustomers([newCustomer, ...customers]);
-    fetchCustomers(); // a bit inefficient, but ensures consistency
+    
+    fetchCustomers();
   };
 
   return (

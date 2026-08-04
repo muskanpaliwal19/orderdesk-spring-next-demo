@@ -31,7 +31,7 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/api/health").permitAll()
-                .anyRequest().authenticated())
+                .anyRequest().permitAll())
             .httpBasic(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable());
         return http.build();
