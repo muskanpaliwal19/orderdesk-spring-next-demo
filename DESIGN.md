@@ -1,24 +1,33 @@
 # DESIGN.md
 
 ## Core Technology
-- **Framework**: Use Next.js with TypeScript.
-- **Scope**: Build only the essential operational screens: dashboard/revenue, customers, products, orders, and audit visibility.
-- **Architecture**: Implement a dedicated API client layer to communicate with the Spring Boot REST backend.
+- Build the frontend application using Next.js and TypeScript.
+- Create a dedicated API client layer to handle all communication with the Spring Boot REST endpoints.
 
 ## Styling & Layout
-- **Responsiveness**: Ensure the UI is responsive and functional on both laptop and narrow screen sizes.
-- **System**: Implement a lightweight styling system. Prioritize clarity and function for a business-facing application.
-- **Consistency**: Use a consistent system for colors, spacing, and typography. Do NOT use inline styles or introduce one-off styling values.
+- Implement a responsive layout that works on both laptop and narrow screen widths.
+- Maintain a lightweight, clean, and business-facing aesthetic suitable for data-dense operational screens.
+- Do NOT use a generic or unstyled CRUD scaffold look.
 
 ## Components
-- Build the following as simple, reusable components:
-    - Data Tables
-    - Forms
-    - Filter controls
-    - Status Badges
-    - Summary Cards
+- Create simple, reusable components for common UI patterns. Do NOT create one-off styles for single-use cases.
+
+### Core Component Patterns
+- **Data Tables:** For displaying lists of customers, products, orders, etc.
+- **Forms:** For creating and editing data.
+- **Filter Controls:** For refining data displayed in tables.
+- **Status Badges:** To visually indicate the status of an order.
+- **Summary Cards:** For displaying key metrics on the dashboard.
 
 ### Component-Specific Rules
-- **Status Badges**: Use visually distinct colors and styles for different order statuses to ensure they are easily distinguishable at a glance.
-- **Forms**: Design forms to clearly display backend validation errors to the user.
-- **Focus**: Ensure components feel integrated into a cohesive, business-focused application, not like a generic CRUD scaffold.
+- **Forms:** Must clearly display validation errors returned from the backend API.
+- **Status Badges:** Use distinct colors to make different order statuses immediately distinguishable.
+
+## Application Scope
+- Focus UI development on the following core screens:
+    - Dashboard/Revenue
+    - Customers
+    - Products
+    - Orders
+    - Audit Visibility
+- Do NOT build features or screens outside this defined scope.
