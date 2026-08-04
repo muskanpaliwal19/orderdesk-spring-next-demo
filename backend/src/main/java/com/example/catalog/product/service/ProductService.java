@@ -20,7 +20,7 @@ public class ProductService {
     }
 
     public List<ProductDto> getProducts() {
-                return productRepository.findAllByActiveTrueOrderByNameAsc()
+                return productRepository.findAllByIsActiveTrueOrderByNameAsc()
                 .stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
