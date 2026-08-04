@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+import com.example.orders.dto.OrderExportRow;
 
 import java.util.Map;
 
@@ -59,6 +62,30 @@ public class OrderController {
         response.setContentType("text/csv");
         response.setHeader("Content-Disposition", "attachment; filename=\"orders.csv\"");
 
-        orderService.exportOrdersToCsv(response.getWriter(), orderStatus);
+        List<OrderExportRow> orders = orderService.findOrdersForExport(orderStatus);
+        try (PrintWriter writer = response.getWriter()) {
+            writer.println("Order ID,Customer Email,Status,Order Date,Total Amount");
+
+            for (OrderExportRow order : orders) {
+                writer.println(
+                        sanitizeForCsv(order.id()) + "," +
+                                sanitizeForCsv(order.customerEmail()) + "," +
+                                sanitizeForCsv(order.status()) + "," +
+                                sanitizeForCsv(order.orderDate()) + "," +
+                                sanitizeForCsv(order.totalCents() / 100.0)
+                );
+            }
+        }
+    }
+
+    private String sanitizeForCsv(Object data) {
+        if (data == null) {
+            return "";
+        }
+        String value = String.valueOf(data);
+        if (value.startsWith("=") || value.startsWith("+") || value.startsWith("-") || value.startsWith("@")) {
+            return "'" + value;
+        }
+        return value;
     }
 }
