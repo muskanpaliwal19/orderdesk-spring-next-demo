@@ -19,6 +19,12 @@ export default function CustomerForm({ onCustomerAdded, onError }: CustomerFormP
     setIsSubmitting(true);
     onError(null);
 
+    if (!name || !email) {
+      onError("Name and email are required.");
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const response = await fetch("/api/customers", {
         method: "POST",
