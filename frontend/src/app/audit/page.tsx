@@ -33,7 +33,8 @@ function formatTimestamp(iso: string) {
 
 export default function AuditTrailPage() {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
-  const [loading, setLoading] = useState(.true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchAuditLogs() {
@@ -42,9 +43,12 @@ export default function AuditTrailPage() {
         if (response.ok) {
           const data = await response.json();
           setAuditLogs(data);
+        } else {
+          setError('An error occurred while fetching the audit trail.');
         }
       } catch (error) {
         console.error('Failed to fetch audit logs:', error);
+        setError('An error occurred while fetching the audit trail.');
       } finally {
         setLoading(false);
       }
@@ -73,7 +77,7 @@ export default function AuditTrailPage() {
               <tr>
                 <td colSpan={3} className="p-4 text-center text-gray-500">Loading...</td>
               </tr>
-            ) : auditLogs.length > 0 ? (
+            ) : error ? (\n              <tr>\n                <td colSpan={3} className=\"p-4 text-center text-red-500\">{error}</td>\n              </tr>\n            ) : auditLogs.length > 0 ? (
               auditLogs.map((entry) => (
                 <tr key={entry.id} className="hover:bg-surface-50 transition-colors">
                   <td className="px-4 py-3 whitespace-nowrap">{formatTimestamp(entry.createdAt)}</td>
