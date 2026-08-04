@@ -3,6 +3,7 @@ package com.example.auditlog.controller;
 import com.example.auditlog.jpa.AuditLog;
 import com.example.auditlog.service.AuditLogService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +21,7 @@ public class AuditLogController {
         this.auditLogService = auditLogService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public List<AuditLog> getRecentAuditLogs() {
         return auditLogService.getRecentAuditLogs();
