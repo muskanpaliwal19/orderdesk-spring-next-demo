@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -23,7 +24,7 @@ public class OrderService {
 
     public Order createOrder(Order order) {
         Order savedOrder = orderRepository.save(order);
-        auditLogService.logEvent("ORDER_CREATED", "Order created with ID: " + savedOrder.getId());
+        auditLogService.logEvent("ORDER_CREATED", Map.of("orderId", savedOrder.getId()));
         return savedOrder;
     }
 
@@ -36,7 +37,7 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found"));
         order.setStatus(status);
         Order updatedOrder = orderRepository.save(order);
-        auditLogService.logEvent("ORDER_STATUS_UPDATED", "Order " + id + " status updated to " + status);
+        auditLogService.logEvent("ORDER_STATUS_UPDATED", Map.of("orderId", id, "newStatus", status.toString()));
         return updatedOrder;
     }
 
