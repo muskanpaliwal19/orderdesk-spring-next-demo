@@ -10,5 +10,5 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     
     List<Product> findByCategoryAndIdNot(String category, Long id);
-    List<Product> findAllByIsActiveTrueOrderByNameAsc();
+        List<Product> findAllByActiveTrueOrderByNameAsc();
 }

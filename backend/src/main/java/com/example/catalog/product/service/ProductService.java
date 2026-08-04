@@ -20,7 +20,7 @@ public class ProductService {
     }
 
     public List<ProductDto> getProducts() {
-        return productRepository.findAllByIsActiveTrueOrderByNameAsc()
+                return productRepository.findAllByActiveTrueOrderByNameAsc()
                 .stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
@@ -30,7 +30,8 @@ public class ProductService {
         BigDecimal price = BigDecimal.valueOf(product.getUnitPriceCents()).divide(BigDecimal.valueOf(100));
         return new ProductDto(
                 product.getId(),
-                product.getName(),\n                product.getSku(),
+                product.getName(),
+                product.getSku(),
                 product.getDescription(),
                 price,
                 product.getCategory()
