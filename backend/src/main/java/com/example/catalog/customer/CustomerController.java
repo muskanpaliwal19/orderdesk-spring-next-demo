@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -19,7 +20,9 @@ public class CustomerController {
 
     @GetMapping
     public List<CustomerResponse> getAllCustomers() {
-        return customerService.getAllCustomers();
+        return customerService.getAllCustomers().stream()
+                .map(CustomerResponse::fromCustomer)
+                .collect(Collectors.toList());
     }
 
     @PostMapping

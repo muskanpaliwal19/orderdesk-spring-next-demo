@@ -16,10 +16,8 @@ public class CustomerService {
         this.customerRepository = customerRepository;
     }
 
-    public List<CustomerResponse> getAllCustomers() {
-        return customerRepository.findAll().stream()
-                .map(CustomerResponse::fromCustomer)
-                .collect(Collectors.toList());
+    public List<Customer> getAllCustomers() {
+        return customerRepository.findAll();
     }
 
     public Customer createCustomer(CreateCustomerRequest request) {
