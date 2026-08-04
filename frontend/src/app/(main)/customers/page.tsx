@@ -1,54 +1,29 @@
-'use client';
-
-import { useState, useEffect } from 'react';
 import { Customer } from '@/types/customer';
-import CustomerTable from '@/components/CustomerTable';
-import CustomerForm from '@/components/CustomerForm';
-import ErrorBanner from '@/components/ErrorBanner';
+import CustomersList from './CustomersList';
 
-export default function CustomersPage() {
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+async function getCustomers(): Promise<{ customers: Customer[]; error: string | null }> {
+  try {
+    // In a real app, use an environment variable for the API URL.
+    const res = await fetch('http://localhost:3000/api/customers', { cache: 'no-store' });
 
-  const fetchCustomers = async () => {
-    try {
-      setIsLoading(true);
-      const res = await fetch('/api/customers', { cache: 'no-store' });
-      if (!res.ok) {
-        throw new Error('Failed to fetch customers');
-      }
-      const data = await res.json();
-      setCustomers(data);
-    } catch (err) {
-        if (err instanceof Error) {
-            setError(err.message);
-        } else {
-            setError('An unknown error occurred.');
-        }
-    } finally {
-      setIsLoading(false);
+    if (!res.ok) {
+      return { customers: [], error: 'Failed to fetch customers.' };
     }
-  };
 
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
+    return { customers: await res.json(), error: null };
+  } catch (e) {
+    const error = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { customers: [], error };
+  }
+}
 
-  const handleCustomerAdded = () => {
-    fetchCustomers();
-  };
+export default async function CustomersPage() {
+  const { customers, error } = await getCustomers();
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">Customers</h1>
-      <ErrorBanner message={error} />
-      <CustomerForm onCustomerAdded={handleCustomerAdded} onError={setError} />
-      {isLoading ? (
-        <p>Loading customers...</p>
-      ) : (
-        <CustomerTable customers={customers} />
-      )}
+      <h1 className=\"text-3xl font-bold mb-6\">Customers</h1>
+      <CustomersList initialCustomers={customers} initialError={error} />
     </div>
   );
 }
