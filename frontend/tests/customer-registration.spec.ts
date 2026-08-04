@@ -18,7 +18,11 @@ test.describe('Customer Registration', () => {
     await expect(page.getByTestId('email-input')).toBeEmpty();
 
     // Check that the new customer is in the table
-    await expect(page.locator(`tr:has-text("Test User") and :has-text("${uniqueEmail}")`)).toBeVisible();
+    const customerRow = page.locator(`tr:has-text("Test User") and :has-text("${uniqueEmail}")`);
+    await expect(customerRow).toBeVisible();
+    
+    const tierBadge = customerRow.locator('span:has-text("STANDARD")');
+    await expect(tierBadge).toBeVisible();
   });
 
   test('should show an error message when registration fails', async ({ page }) => {
