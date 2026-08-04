@@ -71,10 +71,10 @@ class OrderControllerIT {
                 .andExpect(header().string("Content-Disposition", "attachment; filename=\"orders.csv\""))
                 .andExpect(content().contentType("text/csv"))
                 .andExpect(content().string(containsString("id,customer_email,status,order_date,total_cents"))) 
-                .andExpect(content().string(containsString("customer1@example.com,NEW")))
-                .andExpect(content().string(containsString(",1000")))
-                .andExpect(content().string(containsString("customer2@example.com,PAID")))
-                .andExpect(content().string(containsString(",5000")));
+                .andExpect(content().string(containsString("\"customer1@example.com\",\"NEW\"")))
+                .andExpect(content().string(containsString(",\"1000\"")))
+                .andExpect(content().string(containsString("\"customer2@example.com\",\"PAID\"")))
+                .andExpect(content().string(containsString(",\"5000\"")));
     }
 
     @Test
@@ -86,8 +86,8 @@ class OrderControllerIT {
                 .andExpect(content().string(containsString("id,customer_email,status,order_date,total_cents")))
                 .andExpect(content().string(not(containsString("customer1@example.com,NEW"))))
                 .andExpect(content().string(not(containsString(",1000"))))
-                .andExpect(content().string(containsString("customer2@example.com,PAID")))
-                .andExpect(content().string(containsString(",5000")));
+                .andExpect(content().string(containsString("\"customer2@example.com\",\"PAID\"")))
+                .andExpect(content().string(containsString(",\"5000\"")));
     }
 
     @Test
@@ -105,5 +105,27 @@ class OrderControllerIT {
     void exportOrders_invalidStatus() throws Exception {
         mockMvc.perform(get("/api/orders/export").param("status", "INVALID_STATUS"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void exportOrders_rowCountMatchesTotalOrders() throws Exception {
+        // Get the expected row count from the repository
+        long expectedRowCount = orderRepository.count();
+
+        mockMvc.perform(get("/api/orders/export"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("text/csv"))
+                .andExpect(result -> {
+                    String csvContent = result.getResponse().getContentAsString();
+                    // Split lines and filter out empty lines
+                    String[] lines = csvContent.split("\\r?\\n");
+                    long actualRowCount = java.util.Arrays.stream(lines)
+                            .filter(line -> !line.trim().isEmpty())
+                            .count();
+
+                    // Assert that the number of data rows matches the total orders
+                    // (actual rows - 1 for the header)
+                    org.assertj.core.api.Assertions.assertThat(actualRowCount - 1).isEqualTo(expectedRowCount);
+                });
     }
 }
