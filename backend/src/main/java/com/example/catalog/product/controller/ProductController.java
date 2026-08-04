@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/products")
@@ -21,8 +22,17 @@ public class ProductController {
     }
 
     @GetMapping("/{id}/similar")
-    public ResponseEntity<List<Product>> getSimilarProducts(@PathVariable Long id) {
+    public ResponseEntity<List<ProductDto>> getSimilarProducts(@PathVariable Long id) {
         List<Product> similarProducts = productService.getSimilarProducts(id);
-        return ResponseEntity.ok(similarProducts);
+        return ResponseEntity.ok(similarProducts.stream().map(this::toDto).collect(Collectors.toList()));
+    }
+
+    private ProductDto toDto(Product product) {
+        return new ProductDto(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getCategory());
     }
 }
