@@ -1,6 +1,7 @@
 package com.example.catalog.product.controller;
 
 import com.example.catalog.product.Product;
+import com.example.catalog.product.dto.ProductDto;
 import com.example.catalog.product.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
