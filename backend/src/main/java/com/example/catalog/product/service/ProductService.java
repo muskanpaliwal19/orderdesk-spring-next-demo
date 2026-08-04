@@ -1,7 +1,7 @@
 package com.example.catalog.product.service;
 
 import com.example.catalog.product.Product;
-import com.example.catalog.product.controller.ProductDto;
+import com.example.catalog.product.dto.ProductDto;
 import com.example.catalog.product.exception.ProductNotFoundException;
 import com.example.catalog.product.repository.ProductRepository;
 import org.springframework.stereotype.Service;
