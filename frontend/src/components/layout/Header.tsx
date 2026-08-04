@@ -10,6 +10,14 @@ const navLinks = [
     { href: '/products', label: 'Products' },
 ];
 
+export default function Header() const navLinks = [
+    { href: '/', label: 'Dashboard' },
+    { href: '/orders', label: 'Orders' },
+    { href: '/customers', label: 'Customers' },
+    { href: '/products', label: 'Products' },
+    { href: '/audit', label: 'Audit Trail' },
+];
+
 export default function Header() {
     const pathname = usePathname();
 
