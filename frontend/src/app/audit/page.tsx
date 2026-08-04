@@ -41,7 +41,7 @@ export default function AuditTrailPage() {
       try {
         const response = await fetch('/api/audit-logs');
         if (response.ok) {
-          const data = await response.json();
+          const data = await response.json() as AuditLog[];
           setAuditLogs(data);
         } else {
           setError('An error occurred while fetching the audit trail.');
