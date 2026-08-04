@@ -1,4 +1,4 @@
-package com.example.retail_next_gen.product;
+package com.example.catalog.product;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,14 +16,16 @@ public class Product {
     private String name;
     private String description;
     private double price;
+    private String category;
 
     public Product() {
     }
 
-    public Product(String name, String description, double price) {
+    public Product(String name, String description, double price, String category) {
         this.name = name;
         this.description = description;
         this.price = price;
+        this.category = category;
     }
 
     public Long getId() {
@@ -56,5 +58,13 @@ public class Product {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }
