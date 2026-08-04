@@ -28,7 +28,7 @@ public class CreateCustomerRequest {
         this.email = email;
     }
 
-    private CustomerTier tier = CustomerTier.STANDARD;
+    private CustomerTier tier;
 
     public CustomerTier getTier() {
         return tier;
