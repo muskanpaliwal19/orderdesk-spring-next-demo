@@ -4,7 +4,7 @@ import CustomersList from './CustomersList';
 async function getCustomers(): Promise<{ customers: Customer[]; error: string | null }> {
   try {
     // In a real app, use an environment variable for the API URL.
-    const res = await fetch('http://localhost:3000/api/customers', { cache: 'no-store' });
+    const res = await fetch('http://localhost:8080/api/customers', { cache: 'no-store' });
 
     if (!res.ok) {
       // Per customer feedback, we're now parsing the JSON body of the error response.
