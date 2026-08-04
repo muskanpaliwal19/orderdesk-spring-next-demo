@@ -47,4 +47,32 @@ test.describe('Customer Registration', () => {
     // The form should not have been cleared
     await expect(page.getByTestId('name-input')).toHaveValue('Error User');
   });
+
+  test('should show an error message when email is already taken', async ({ page }) => {
+    await page.goto('/customers');
+
+    const duplicateEmail = `duplicate_${Date.now()}@example.com`;
+
+    // Create the first customer
+    await page.getByTestId('name-input').fill('First User');
+    await page.getByTestId('email-input').fill(duplicateEmail);
+    await page.getByTestId('submit-button').click();
+
+    // Wait for the form to clear and the customer to appear in the table
+    await expect(page.getByTestId('name-input')).toBeEmpty();
+    await expect(page.locator(`tr:has-text("First User")`)).toBeVisible();
+
+    // Attempt to create a second customer with the same email
+    await page.getByTestId('name-input').fill('Second User');
+    await page.getByTestId('email-input').fill(duplicateEmail);
+    await page.getByTestId('submit-button').click();
+
+    // Check for the error message
+    const errorBanner = page.locator('div[role="alert"]');
+    await expect(errorBanner).toBeVisible();
+    await expect(errorBanner).toContainText('A customer with this email already exists.');
+
+    // Check that the form was not cleared
+    await expect(page.getByTestId('name-input')).toHaveValue('Second User');
+  });
 });
