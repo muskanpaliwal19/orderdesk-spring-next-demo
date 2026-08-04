@@ -6,19 +6,19 @@ import java.time.LocalDateTime;
 public class AuditLogDto {
 
     private String eventType;
-    private String eventDetails;
+    private String message;
     private LocalDateTime createdAt;
 
-    public AuditLogDto(String eventType, String eventDetails, LocalDateTime createdAt) {
+    public AuditLogDto(String eventType, String message, LocalDateTime createdAt) {
         this.eventType = eventType;
-        this.eventDetails = eventDetails;
+        this.message = message;
         this.createdAt = createdAt;
     }
 
     public static AuditLogDto fromEntity(AuditLog auditLog) {
         return new AuditLogDto(
             auditLog.getEventType(),
-            auditLog.getEventDetails(),
+            auditLog.getMessage(),
             auditLog.getCreatedAt()
         );
     }
@@ -31,12 +31,12 @@ public class AuditLogDto {
         this.eventType = eventType;
     }
 
-    public String getEventDetails() {
-        return eventDetails;
+    public String getMessage() {
+        return message;
     }
 
-    public void setEventDetails(String eventDetails) {
-        this.eventDetails = eventDetails;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public LocalDateTime getCreatedAt() {

@@ -1,20 +1,25 @@
 package com.example.orders;
 
+import com.example.auditlog.jpa.AuditLog;
+import com.example.auditlog.repository.AuditLogRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -31,6 +36,12 @@ class OrderControllerIT {
     @Autowired
     private CustomerRepository customerRepository;
 
+    @Autowired
+    private AuditLogRepository auditLogRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
     private Customer customer1;
     private Customer customer2;
     private Order order1;
@@ -40,6 +51,7 @@ class OrderControllerIT {
     void setUp() {
         customerRepository.deleteAll();
         orderRepository.deleteAll();
+        auditLogRepository.deleteAll();
 
         customer1 = new Customer("customer1@example.com", "Customer One");
         customerRepository.save(customer1);
@@ -61,6 +73,7 @@ class OrderControllerIT {
     @AfterEach
     void tearDown() {
         orderRepository.deleteAll();
+        auditLogRepository.deleteAll();
         customerRepository.deleteAll();
     }
 
@@ -70,7 +83,7 @@ class OrderControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Disposition", "attachment; filename=\"orders.csv\""))
                 .andExpect(content().contentType("text/csv"))
-                .andExpect(content().string(containsString("id,customer_email,status,order_date,total_cents"))) 
+                .andExpect(content().string(containsString("id,customer_email,status,order_date,total_cents")))
                 .andExpect(content().string(containsString("\"customer1@example.com\",\"NEW\"")))
                 .andExpect(content().string(containsString(",\"1000\"")))
                 .andExpect(content().string(containsString("\"customer2@example.com\",\"PAID\"")))
@@ -93,6 +106,7 @@ class OrderControllerIT {
     @Test
     void exportOrders_emptyResult() throws Exception {
         orderRepository.deleteAll();
+        auditLogRepository.deleteAll();
 
         mockMvc.perform(get("/api/orders/export"))
                 .andExpect(status().isOk())
@@ -127,5 +141,41 @@ class OrderControllerIT {
                     // (actual rows - 1 for the header)
                     org.assertj.core.api.Assertions.assertThat(actualRowCount - 1).isEqualTo(expectedRowCount);
                 });
+    }
+
+    @Test
+    void createOrder_createsAuditLog() throws Exception {
+        long initialAuditLogCount = auditLogRepository.count();
+
+        Order newOrder = new Order(customer1, Instant.now(), OrderStatus.NEW);
+        OrderItem item = new OrderItem(newOrder, "Product C", 1, 5000);
+        newOrder.setItems(List.of(item));
+
+        mockMvc.perform(post("/api/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newOrder)))
+                .andExpect(status().isOk());
+
+        assertThat(auditLogRepository.count()).isEqualTo(initialAuditLogCount + 1);
+        AuditLog auditLog = auditLogRepository.findTop50ByOrderByCreatedAtDesc().get(0);
+        assertThat(auditLog.getEventType()).isEqualTo("ORDER_CREATED");
+        assertThat(auditLog.getMessage()).contains(""orderId"");
+    }
+
+    @Test
+    void updateOrderStatus_createsAuditLog() throws Exception {
+        long initialAuditLogCount = auditLogRepository.count();
+        Long orderId = order1.getId();
+
+        mockMvc.perform(put("/api/orders/" + orderId + "/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\": \"SHIPPED\"}"))
+                .andExpect(status().isOk());
+
+        assertThat(auditLogRepository.count()).isEqualTo(initialAuditLogCount + 1);
+        AuditLog auditLog = auditLogRepository.findTop50ByOrderByCreatedAtDesc().get(0);
+        assertThat(auditLog.getEventType()).isEqualTo("ORDER_STATUS_UPDATED");
+        assertThat(auditLog.getMessage()).contains(""orderId\":" + orderId);
+        assertThat(auditLog.getMessage()).contains(""newStatus\":\"SHIPPED\"");
     }
 }

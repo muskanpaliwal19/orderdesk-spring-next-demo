@@ -33,10 +33,10 @@ public class AuditLogService {
         AuditLog auditLog = new AuditLog();
         auditLog.setEventType(eventType);
         try {
-            auditLog.setEventDetails(objectMapper.writeValueAsString(eventDetailsMap));
+            auditLog.setMessage(objectMapper.writeValueAsString(eventDetailsMap));
         } catch (JsonProcessingException e) {
             logger.error("Failed to serialize audit event details for event type {}", eventType, e);
-            auditLog.setEventDetails("{\"error\":\"Failed to serialize event details\"}");
+            auditLog.setMessage("{\"error\":\"Failed to serialize event details\"}");
         }
         auditLog.setCreatedAt(LocalDateTime.now());
         auditLogRepository.save(auditLog);
