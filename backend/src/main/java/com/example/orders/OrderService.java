@@ -45,13 +45,24 @@ public class OrderService {
 
         for (OrderExportRow order : orders) {
             writer.println(
-                    order.id() + "," +
-                            order.customerEmail() + "," +
-                            order.status() + "," +
-                            order.orderDate() + "," +
-                            (order.totalCents() / 100.0)
+                    sanitizeForCsv(order.id()) + "," +
+                            sanitizeForCsv(order.customerEmail()) + "," +
+                            sanitizeForCsv(order.status()) + "," +
+                            sanitizeForCsv(order.orderDate()) + "," +
+                            sanitizeForCsv(order.totalCents() / 100.0)
             );
         }
+    }
+
+    private String sanitizeForCsv(Object data) {
+        if (data == null) {
+            return "";
+        }
+        String value = String.valueOf(data);
+        if (value.startsWith("=") || value.startsWith("+") || value.startsWith("-") || value.startsWith("@")) {
+            return "'" + value;
+        }
+        return value;
     }
 }
 
