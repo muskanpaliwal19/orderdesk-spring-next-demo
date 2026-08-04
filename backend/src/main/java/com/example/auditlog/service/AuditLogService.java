@@ -5,6 +5,7 @@ import com.example.auditlog.repository.AuditLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -19,5 +20,13 @@ public class AuditLogService {
 
     public List<AuditLog> getRecentAuditLogs() {
         return auditLogRepository.findTop50ByOrderByCreatedAtDesc();
+    }
+
+    public void logEvent(String eventType, String eventDetails) {
+        AuditLog auditLog = new AuditLog();
+        auditLog.setEventType(eventType);
+        auditLog.setEventDetails(eventDetails);
+        auditLog.setCreatedAt(LocalDateTime.now());
+        auditLogRepository.save(auditLog);
     }
 }

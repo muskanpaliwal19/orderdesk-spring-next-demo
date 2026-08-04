@@ -1,6 +1,7 @@
 
 package com.example.orders;
 
+import com.example.auditlog.service.AuditLogService;
 import com.example.orders.dto.OrderExportRow;
 import org.springframework.stereotype.Service;
 
@@ -13,13 +14,17 @@ import java.util.Optional;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final AuditLogService auditLogService;
 
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, AuditLogService auditLogService) {
         this.orderRepository = orderRepository;
+        this.auditLogService = auditLogService;
     }
 
     public Order createOrder(Order order) {
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+        auditLogService.logEvent("ORDER_CREATED", "Order created with ID: " + savedOrder.getId());
+        return savedOrder;
     }
 
     public Optional<Order> getOrder(Long id) {
@@ -30,7 +35,9 @@ public class OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
         order.setStatus(status);
-        return orderRepository.save(order);
+        Order updatedOrder = orderRepository.save(order);
+        auditLogService.logEvent("ORDER_STATUS_UPDATED", "Order " + id + " status updated to " + status);
+        return updatedOrder;
     }
 
     public List<OrderExportRow> findOrdersForExport(OrderStatus status) {
