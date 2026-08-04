@@ -6,34 +6,66 @@
 
 # Test info
 
-- Name: customer-registration.spec.ts >> Customer Registration >> should show a client-side error if name is left empty
-- Location: tests/customer-registration.spec.ts:99:7
+- Name: customer-registration.spec.ts >> Customer Registration >> should allow a user to register a new customer
+- Location: tests/customer-registration.spec.ts:21:7
 
 # Error details
 
 ```
-Error: expect(locator).toContainText(expected) failed
+Error: expect(locator).toBeVisible() failed
 
-Locator: locator('div[role="alert"]')
-Expected substring: "Name and email are required."
-Received string:    ""
+Locator: getByRole('row', { name: 'Test User 1785845797152' })
+Expected: visible
 Timeout: 5000ms
+Error: element(s) not found
 
 Call log:
-  - Expect "toContainText" with timeout 5000ms
-  - waiting for locator('div[role="alert"]')
-    14 × locator resolved to <div role="alert" aria-live="assertive" id="__next-route-announcer__"></div>
-       - unexpected value ""
+  - Expect "toBeVisible" with timeout 5000ms
+  - waiting for getByRole('row', { name: 'Test User 1785845797152' })
 
 ```
 
 ```yaml
+- heading "CRM" [level=2]
+- navigation:
+  - list:
+    - listitem:
+      - link "Customers":
+        - /url: /customers
+- main:
+  - heading "Customers" [level=1]
+  - heading "Add New Customer" [level=2]
+  - text: Name
+  - textbox "Name"
+  - text: Email
+  - textbox "Email"
+  - text: Tier
+  - combobox "Tier":
+    - option "Standard" [selected]
+    - option "Premium"
+    - option "Enterprise"
+  - button "Add Customer"
+  - table:
+    - rowgroup:
+      - row "Name Email Tier":
+        - columnheader "Name"
+        - columnheader "Email"
+        - columnheader "Tier"
+    - rowgroup
+- region "Notifications alt+T"
 - alert
 ```
 
 # Test source
 
 ```ts
+  1   | 
+  2   | import { test, expect } from '@playwright/test';
+  3   | 
+  4   | test.describe('Customer Registration', () => {
+  5   |   // Mock initial customer list for all tests in this describe block
+  6   |   test.beforeEach(async ({ page }) => {
+  7   |     await page.route('**/api/customers', route => {
   8   |       // For POST requests, let them pass through to be handled by specific tests
   9   |       if (route.request().method() === 'POST') {
   10  |         return route.continue();
@@ -75,7 +107,8 @@ Call log:
   46  |     
   47  |     // Check that the customer appears in the table
   48  |     const newCustomerRow = page.getByRole('row', { name: uniqueName });
-  49  |     await expect(newCustomerRow).toBeVisible();
+> 49  |     await expect(newCustomerRow).toBeVisible();
+      |                                  ^ Error: expect(locator).toBeVisible() failed
   50  |     const tierBadge = newCustomerRow.getByText('Premium');
   51  |     await expect(tierBadge).toBeVisible();
   52  |   });
@@ -134,8 +167,7 @@ Call log:
   105 | 
   106 |     const errorBanner = page.locator('div[role="alert"]');
   107 |     await expect(errorBanner).toBeVisible();
-> 108 |     await expect(errorBanner).toContainText('Name and email are required.');
-      |                               ^ Error: expect(locator).toContainText(expected) failed
+  108 |     await expect(errorBanner).toContainText('Name and email are required.');
   109 |   });
   110 | 
   111 |   test('should show a client-side error if email is left empty', async ({ page }) => {
@@ -177,12 +209,4 @@ Call log:
   147 | 
   148 |     await page.getByTestId('name-input').fill('Test User');
   149 |     await page.getByTestId('email-input').fill('not-an-email');
-  150 |     await page.getByTestId('submit-button').click();
-  151 | 
-  152 |     const errorBanner = page.locator('div[role="alert"]');
-  153 |     await expect(errorBanner).toBeVisible();
-  154 |     await expect(errorBanner).toContainText('Email should be valid');
-  155 |   });
-  156 | });
-  157 | 
 ```

@@ -41,7 +41,7 @@ export default function CustomersPage() {
     <div>
       <h1 className="text-3xl font-bold mb-6">Customers</h1>
       {error && <ErrorBanner message={error} />}
-      <CustomerForm onCustomerAdded={handleCustomerAdded} onError={setError} />
+      <CustomerForm onCustomerAdded={handleCustomerAdded} />
       {isLoading ? <p>Loading customers...</p> : <CustomerTable customers={customers} />}
     </div>
   );

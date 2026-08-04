@@ -2,25 +2,26 @@
 
 import { useState, FormEvent } from "react";
 import { Customer } from "@/types/customer";
+import ErrorBanner from "@/app/components/ErrorBanner";
 
 interface CustomerFormProps {
   onCustomerAdded: (customer: Customer) => void;
-  onError: (message: string) => void;
 }
 
-export default function CustomerForm({ onCustomerAdded, onError }: CustomerFormProps) {
+export default function CustomerForm({ onCustomerAdded }: CustomerFormProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [tier, setTier] = useState("STANDARD");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setIsSubmitting(true);
-    onError(null);
+    setError(null);
 
     if (!name || !email) {
-      onError("Name and email are required.");
+      setError("Name and email are required.");
       setIsSubmitting(false);
       return;
     }
@@ -46,9 +47,9 @@ export default function CustomerForm({ onCustomerAdded, onError }: CustomerFormP
       setTier("STANDARD");
     } catch (error) {
         if (error instanceof Error) {
-            onError(error.message);
+            setError(error.message);
         } else {
-            onError("An unknown error occurred.");
+            setError("An unknown error occurred.");
         }
     } finally {
       setIsSubmitting(false);
@@ -112,6 +113,7 @@ export default function CustomerForm({ onCustomerAdded, onError }: CustomerFormP
           {isSubmitting ? "Adding..." : "Add Customer"}
         </button>
       </div>
+      {error && <div className="mt-4"><ErrorBanner message={error} /></div>}
     </form>
   );
 }

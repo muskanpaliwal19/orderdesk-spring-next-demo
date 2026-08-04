@@ -6,34 +6,67 @@
 
 # Test info
 
-- Name: customer-registration.spec.ts >> Customer Registration >> should show a client-side error if name is left empty
-- Location: tests/customer-registration.spec.ts:99:7
+- Name: customer-registration.spec.ts >> Customer Registration >> should default to standard tier when no tier is selected
+- Location: tests/customer-registration.spec.ts:54:7
 
 # Error details
 
 ```
-Error: expect(locator).toContainText(expected) failed
+Error: expect(locator).toBeVisible() failed
 
-Locator: locator('div[role="alert"]')
-Expected substring: "Name and email are required."
-Received string:    ""
+Locator: getByRole('cell', { name: 'No customers found.' })
+Expected: visible
 Timeout: 5000ms
+Error: element(s) not found
 
 Call log:
-  - Expect "toContainText" with timeout 5000ms
-  - waiting for locator('div[role="alert"]')
-    14 × locator resolved to <div role="alert" aria-live="assertive" id="__next-route-announcer__"></div>
-       - unexpected value ""
+  - Expect "toBeVisible" with timeout 5000ms
+  - waiting for getByRole('cell', { name: 'No customers found.' })
 
 ```
 
 ```yaml
+- heading "CRM" [level=2]
+- navigation:
+  - list:
+    - listitem:
+      - link "Customers":
+        - /url: /customers
+- main:
+  - heading "Customers" [level=1]
+  - alert: "Failed to execute 'json' on 'Response': Unexpected end of JSON input"
+  - heading "Add New Customer" [level=2]
+  - text: Name
+  - textbox "Name"
+  - text: Email
+  - textbox "Email"
+  - text: Tier
+  - combobox "Tier":
+    - option "Standard" [selected]
+    - option "Premium"
+    - option "Enterprise"
+  - button "Add Customer"
+  - table:
+    - rowgroup:
+      - row "Name Email Tier":
+        - columnheader "Name"
+        - columnheader "Email"
+        - columnheader "Tier"
+    - rowgroup
+- region "Notifications alt+T"
 - alert
 ```
 
 # Test source
 
 ```ts
+  1   | 
+  2   | import { test, expect } from '@playwright/test';
+  3   | 
+  4   | test.describe('Customer Registration', () => {
+  5   |   // Mock initial customer list for all tests in this describe block
+  6   |   test.beforeEach(async ({ page }) => {
+  7   |     await page.route('**/api/customers', route => {
   8   |       // For POST requests, let them pass through to be handled by specific tests
   9   |       if (route.request().method() === 'POST') {
   10  |         return route.continue();
@@ -110,7 +143,8 @@ Call log:
   81  |     await page.goto('/customers');
   82  |     
   83  |     // beforeEach ensures table is empty because it mocks the GET request
-  84  |     await expect(page.getByRole('cell', { name: 'No customers found.' })).toBeVisible();
+> 84  |     await expect(page.getByRole('cell', { name: 'No customers found.' })).toBeVisible();
+      |                                                                           ^ Error: expect(locator).toBeVisible() failed
   85  | 
   86  |     // Fill form, leave tier as default
   87  |     await page.getByPlaceholder('Name').fill(uniqueName);
@@ -134,8 +168,7 @@ Call log:
   105 | 
   106 |     const errorBanner = page.locator('div[role="alert"]');
   107 |     await expect(errorBanner).toBeVisible();
-> 108 |     await expect(errorBanner).toContainText('Name and email are required.');
-      |                               ^ Error: expect(locator).toContainText(expected) failed
+  108 |     await expect(errorBanner).toContainText('Name and email are required.');
   109 |   });
   110 | 
   111 |   test('should show a client-side error if email is left empty', async ({ page }) => {
