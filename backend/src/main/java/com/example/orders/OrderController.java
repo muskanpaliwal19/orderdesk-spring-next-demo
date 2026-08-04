@@ -72,10 +72,6 @@ public class OrderController {
         if (data == null) {
             return "";
         }
-        String value = String.valueOf(data);
-        if (value.startsWith("=") || value.startsWith("+") || value.startsWith("-") || value.startsWith("@")) {
-            return "'" + value;
-        }
-        return value;
+        return "\"" + String.valueOf(data).replace("\"", "\"\"") + "\"";
     }
 }
