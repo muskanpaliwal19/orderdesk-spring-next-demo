@@ -26,36 +26,51 @@ Call log:
 ```
 
 ```yaml
-- heading "CRM" [level=2]
-- navigation:
-  - list:
-    - listitem:
-      - link "Customers":
-        - /url: /customers
+- banner:
+  - navigation:
+    - link "Home":
+      - /url: /
+    - link "Quotes":
+      - /url: /quotes
 - main:
-  - heading "Customers" [level=1]
-  - heading "Add New Customer" [level=2]
-  - text: Name
-  - textbox "Name"
-  - text: Email
-  - textbox "Email"
-  - text: Tier
-  - combobox "Tier":
-    - option "Standard" [selected]
-    - option "Premium"
-    - option "Enterprise"
-  - button "Add Customer"
+  - heading "Quotes" [level=1]
+  - link "New Quote":
+    - /url: /quotes/new
   - table:
     - rowgroup:
-      - row "Name Email Tier":
-        - columnheader "Name"
-        - columnheader "Email"
-        - columnheader "Tier"
+      - row "Customer Amount Status Actions":
+        - columnheader "Customer"
+        - columnheader "Amount"
+        - columnheader "Status"
+        - columnheader "Actions"
     - rowgroup:
-      - row "Test Customer test@example.com STANDARD":
-        - cell "Test Customer"
-        - cell "test@example.com"
-        - cell "STANDARD"
+      - row "Acme Corp 1200.50 Draft ViewEdit":
+        - cell "Acme Corp"
+        - cell "1200.50"
+        - cell "Draft"
+        - cell "ViewEdit":
+          - link "View":
+            - /url: /quotes/1
+          - link "Edit":
+            - /url: /quotes/1/edit
+      - row "Stark Industries 5500.00 Sent ViewEdit":
+        - cell "Stark Industries"
+        - cell "5500.00"
+        - cell "Sent"
+        - cell "ViewEdit":
+          - link "View":
+            - /url: /quotes/2
+          - link "Edit":
+            - /url: /quotes/2/edit
+      - row "Wayne Enterprises 2300.75 Accepted ViewEdit":
+        - cell "Wayne Enterprises"
+        - cell "2300.75"
+        - cell "Accepted"
+        - cell "ViewEdit":
+          - link "View":
+            - /url: /quotes/3
+          - link "Edit":
+            - /url: /quotes/3/edit
 - region "Notifications alt+T"
 - alert
 ```

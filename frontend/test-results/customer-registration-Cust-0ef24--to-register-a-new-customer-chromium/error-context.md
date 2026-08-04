@@ -14,18 +14,24 @@
 ```
 Error: expect(locator).toBeVisible() failed
 
-Locator: getByRole('row', { name: 'Test User 1785846813239' })
+Locator: getByRole('row', { name: 'Test User 1785852914001' })
 Expected: visible
 Timeout: 5000ms
 Error: element(s) not found
 
 Call log:
   - Expect "toBeVisible" with timeout 5000ms
-  - waiting for getByRole('row', { name: 'Test User 1785846813239' })
+  - waiting for getByRole('row', { name: 'Test User 1785852914001' })
 
 ```
 
 ```yaml
+- banner:
+  - navigation:
+    - link "Home":
+      - /url: /
+    - link "Quotes":
+      - /url: /quotes
 - heading "CRM" [level=2]
 - navigation:
   - list:

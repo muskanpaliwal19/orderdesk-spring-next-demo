@@ -26,6 +26,12 @@ Call log:
 ```
 
 ```yaml
+- banner:
+  - navigation:
+    - link "Home":
+      - /url: /
+    - link "Quotes":
+      - /url: /quotes
 - heading "CRM" [level=2]
 - navigation:
   - list:
@@ -34,6 +40,7 @@ Call log:
         - /url: /customers
 - main:
   - heading "Customers" [level=1]
+  - alert: Failed to fetch customers.
   - heading "Add New Customer" [level=2]
   - text: Name
   - textbox "Name"
@@ -51,11 +58,7 @@ Call log:
         - columnheader "Name"
         - columnheader "Email"
         - columnheader "Tier"
-    - rowgroup:
-      - row "Test Customer test@example.com STANDARD":
-        - cell "Test Customer"
-        - cell "test@example.com"
-        - cell "STANDARD"
+    - rowgroup
 - region "Notifications alt+T"
 - alert
 ```

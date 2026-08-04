@@ -17,12 +17,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                 o.customer.email,
                 o.status,
                 o.orderDate,
-                COALESCE(SUM(oi.priceCents * oi.quantity), 0)
+                (SELECT COALESCE(SUM(oi.priceCents * oi.quantity), 0) FROM OrderItem oi WHERE oi.order = o)
             )
             FROM Order o
-            LEFT JOIN o.items oi
             WHERE (:status IS NULL OR o.status = :status)
-            GROUP BY o.id, o.customer.email, o.status, o.orderDate
             ORDER BY o.id ASC
             """)
     List<OrderExportRow> findOrdersForExport(@Param("status") OrderStatus status);

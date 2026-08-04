@@ -26,46 +26,55 @@ Call log:
 
 ```yaml
 - generic [active] [ref=e1]:
-  - generic [ref=e2]:
-    - generic [ref=e3]:
-      - heading "CRM" [level=2] [ref=e4]
-      - navigation [ref=e5]:
-        - list [ref=e6]:
-          - listitem [ref=e7]:
-            - link "Customers" [ref=e8] [cursor=pointer]:
-              - /url: /customers
-    - main [ref=e9]:
-      - generic [ref=e10]:
-        - heading "Customers" [level=1] [ref=e11]
-        - generic [ref=e12]:
-          - heading "Add New Customer" [level=2] [ref=e13]
-          - generic [ref=e14]:
-            - generic [ref=e15]: Name
-            - textbox "Name" [ref=e16]
-          - generic [ref=e17]:
-            - generic [ref=e18]: Email
-            - textbox "Email" [ref=e19]
-          - generic [ref=e20]:
-            - generic [ref=e21]: Tier
-            - combobox "Tier" [ref=e22]:
-              - option "Standard" [selected]
-              - option "Premium"
-              - option "Enterprise"
-          - button "Add Customer" [ref=e24] [cursor=pointer]
-        - table [ref=e26]:
-          - rowgroup [ref=e27]:
-            - row [ref=e28]:
-              - columnheader "Name" [ref=e29]
-              - columnheader "Email" [ref=e30]
-              - columnheader "Tier" [ref=e31]
-          - rowgroup [ref=e32]:
-            - row [ref=e33]:
-              - cell "Test Customer" [ref=e34]
-              - cell "test@example.com" [ref=e35]
-              - cell "STANDARD" [ref=e36]
+  - banner [ref=e2]:
+    - navigation [ref=e3]:
+      - link "Home" [ref=e4] [cursor=pointer]:
+        - /url: /
+      - link "Quotes" [ref=e5] [cursor=pointer]:
+        - /url: /quotes
+  - main [ref=e6]:
+    - heading "Quotes" [level=1] [ref=e7]
+    - generic [ref=e8]:
+      - link "New Quote" [ref=e10] [cursor=pointer]:
+        - /url: /quotes/new
+      - table [ref=e11]:
+        - rowgroup [ref=e12]:
+          - row [ref=e13]:
+            - columnheader "Customer" [ref=e14]
+            - columnheader "Amount" [ref=e15]
+            - columnheader "Status" [ref=e16]
+            - columnheader "Actions" [ref=e17]
+        - rowgroup [ref=e18]:
+          - row [ref=e19]:
+            - cell "Acme Corp" [ref=e20]
+            - cell "1200.50" [ref=e21]
+            - cell "Draft" [ref=e22]
+            - cell [ref=e23]:
+              - link "View" [ref=e24] [cursor=pointer]:
+                - /url: /quotes/1
+              - link "Edit" [ref=e25] [cursor=pointer]:
+                - /url: /quotes/1/edit
+          - row [ref=e26]:
+            - cell "Stark Industries" [ref=e27]
+            - cell "5500.00" [ref=e28]
+            - cell "Sent" [ref=e29]
+            - cell [ref=e30]:
+              - link "View" [ref=e31] [cursor=pointer]:
+                - /url: /quotes/2
+              - link "Edit" [ref=e32] [cursor=pointer]:
+                - /url: /quotes/2/edit
+          - row [ref=e33]:
+            - cell "Wayne Enterprises" [ref=e34]
+            - cell "2300.75" [ref=e35]
+            - cell "Accepted" [ref=e36]
+            - cell [ref=e37]:
+              - link "View" [ref=e38] [cursor=pointer]:
+                - /url: /quotes/3
+              - link "Edit" [ref=e39] [cursor=pointer]:
+                - /url: /quotes/3/edit
   - region "Notifications alt+T"
-  - button "Open Next.js Dev Tools" [ref=e42] [cursor=pointer]
-  - alert [ref=e46]
+  - button "Open Next.js Dev Tools" [ref=e45] [cursor=pointer]
+  - alert [ref=e49]
 ```
 
 # Test source
