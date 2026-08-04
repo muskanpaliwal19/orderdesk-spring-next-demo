@@ -47,11 +47,11 @@ class OrderControllerIT {
         customer2 = new Customer("customer2@example.com", "Customer Two");
         customerRepository.save(customer2);
 
-        order1 = new Order(customer1, Instant.now(), OrderStatus.PENDING);
+        order1 = new Order(customer1, Instant.now(), OrderStatus.NEW);
         OrderItem item1 = new OrderItem(order1, "Product A", 1, 1000); // 10.00
         order1.setItems(List.of(item1));
 
-        order2 = new Order(customer2, Instant.now(), OrderStatus.COMPLETED);
+        order2 = new Order(customer2, Instant.now(), OrderStatus.PAID);
         OrderItem item2 = new OrderItem(order2, "Product B", 2, 2500); // 50.00
         order2.setItems(List.of(item2));
 
@@ -71,22 +71,22 @@ class OrderControllerIT {
                 .andExpect(header().string("Content-Disposition", "attachment; filename=\"orders.csv\""))
                 .andExpect(content().contentType("text/csv"))
                 .andExpect(content().string(containsString("Order ID,Customer Email,Status,Order Date,Total Amount"))) 
-                .andExpect(content().string(containsString("customer1@example.com,PENDING")))
+                .andExpect(content().string(containsString("customer1@example.com,NEW")))
                 .andExpect(content().string(containsString("10.0")))
-                .andExpect(content().string(containsString("customer2@example.com,COMPLETED")))
+                .andExpect(content().string(containsString("customer2@example.com,PAID")))
                 .andExpect(content().string(containsString("50.0")));
     }
 
     @Test
     void exportOrders_withStatusFilter_success() throws Exception {
-        mockMvc.perform(get("/api/orders/export").param("status", "COMPLETED"))
+        mockMvc.perform(get("/api/orders/export").param("status", "PAID"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Disposition", "attachment; filename=\"orders.csv\""))
                 .andExpect(content().contentType("text/csv"))
                 .andExpect(content().string(containsString("Order ID,Customer Email,Status,Order Date,Total Amount")))
-                .andExpect(content().string(not(containsString("customer1@example.com,PENDING"))))
+                .andExpect(content().string(not(containsString("customer1@example.com,NEW"))))
                 .andExpect(content().string(not(containsString("10.0"))))
-                .andExpect(content().string(containsString("customer2@example.com,COMPLETED")))
+                .andExpect(content().string(containsString("customer2@example.com,PAID")))
                 .andExpect(content().string(containsString("50.0")));
     }
 
