@@ -4,8 +4,12 @@ package com.example.orders;
 import com.example.audit.AuditLog;
 import com.example.audit.AuditLogRepository;
 
+import com.example.orders.dto.OrderExportRow;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -34,4 +38,20 @@ public class OrderService {
         auditLogRepository.save(new AuditLog(id, status.toString(), "status_changed"));
         return orderRepository.save(order);
     }
+
+    public void exportOrdersToCsv(PrintWriter writer, OrderStatus status) {
+        List<OrderExportRow> orders = orderRepository.findOrdersForExport(status);
+        writer.println("Order ID,Customer Email,Status,Order Date,Total Amount");
+
+        for (OrderExportRow order : orders) {
+            writer.println(
+                    order.getOrderId() + "," +
+                            order.getCustomerEmail() + "," +
+                            order.getStatus() + "," +
+                            order.getOrderDate() + "," +
+                            order.getTotalAmount()
+            );
+        }
+    }
 }
+

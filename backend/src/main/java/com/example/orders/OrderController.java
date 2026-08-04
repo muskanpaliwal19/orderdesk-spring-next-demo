@@ -4,6 +4,9 @@ package com.example.orders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 import java.util.Map;
 
 @RestController
@@ -39,5 +42,23 @@ public class OrderController {
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/export")
+    public void exportOrders(HttpServletResponse response, @RequestParam(required = false) String status) throws IOException {
+        OrderStatus orderStatus = null;
+        if (status != null && !status.isEmpty()) {
+            try {
+                orderStatus = OrderStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid status: " + status);
+                return;
+            }
+        }
+
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=\"orders.csv\"");
+
+        orderService.exportOrdersToCsv(response.getWriter(), orderStatus);
     }
 }
