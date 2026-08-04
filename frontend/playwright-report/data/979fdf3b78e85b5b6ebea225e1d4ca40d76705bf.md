@@ -12,10 +12,50 @@
 # Error details
 
 ```
-Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
-Call log:
-  - navigating to "http://localhost:3000/", waiting until "load"
+Error: expect(locator).toBeVisible() failed
 
+Locator: locator('div').filter({ has: locator('span:has-text("Total Revenue")') })
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" with timeout 5000ms
+  - waiting for locator('div').filter({ has: locator('span:has-text("Total Revenue")') })
+
+```
+
+```yaml
+- heading "CRM" [level=2]
+- navigation:
+  - list:
+    - listitem:
+      - link "Customers":
+        - /url: /customers
+- main:
+  - heading "Customers" [level=1]
+  - alert: "Failed to execute 'json' on 'Response': Unexpected end of JSON input"
+  - heading "Add New Customer" [level=2]
+  - text: Name
+  - textbox "Name"
+  - text: Email
+  - textbox "Email"
+  - text: Tier
+  - combobox "Tier":
+    - option "Basic"
+    - option "Standard" [selected]
+    - option "Premium"
+    - option "VIP"
+  - button "Add Customer"
+  - table:
+    - rowgroup:
+      - row "Name Email Tier":
+        - columnheader "Name"
+        - columnheader "Email"
+        - columnheader "Tier"
+    - rowgroup
+- region "Notifications alt+T"
+- alert
 ```
 
 # Test source
@@ -39,12 +79,12 @@ Call log:
   16 |       });
   17 |     });
   18 | 
-> 19 |     await page.goto('/');
-     |                ^ Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+  19 |     await page.goto('/');
   20 | 
   21 |     // Check for the "Total Revenue" card
   22 |     const revenueCard = page.locator('div', { has: page.locator('span:has-text("Total Revenue")') });
-  23 |     await expect(revenueCard).toBeVisible();
+> 23 |     await expect(revenueCard).toBeVisible();
+     |                               ^ Error: expect(locator).toBeVisible() failed
   24 | 
   25 |     // Check for the correctly formatted currency
   26 |     const revenueValue = revenueCard.locator('p.text-3xl');

@@ -97,10 +97,9 @@ export default function CustomerForm({ onCustomerAdded, onError }: CustomerFormP
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           data-testid="tier-select"
         >
-          <option value="BASIC">Basic</option>
           <option value="STANDARD">Standard</option>
           <option value="PREMIUM">Premium</option>
-          <option value="VIP">VIP</option>
+          <option value="ENTERPRISE">Enterprise</option>
         </select>
       </div>
       <div className="flex items-center justify-between">
