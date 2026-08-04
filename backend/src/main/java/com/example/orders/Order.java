@@ -1,7 +1,9 @@
-
 package com.example.orders;
 
 import jakarta.persistence.*;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "orders") // "order" is a reserved keyword in SQL
@@ -11,9 +13,14 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String customerName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
-    private Double total;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> items = new ArrayList<>();
+
+    private Instant orderDate;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
@@ -21,11 +28,13 @@ public class Order {
     public Order() {
     }
 
-    public Order(String customerName, Double total, OrderStatus status) {
-        this.customerName = customerName;
-        this.total = total;
+    public Order(Customer customer, Instant orderDate, OrderStatus status) {
+        this.customer = customer;
+        this.orderDate = orderDate;
         this.status = status;
     }
+
+    // Getters and setters
 
     public Long getId() {
         return id;
@@ -35,20 +44,28 @@ public class Order {
         this.id = id;
     }
 
-    public String getCustomerName() {
-        return customerName;
+    public Customer getCustomer() {
+        return customer;
     }
 
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 
-    public Double getTotal() {
-        return total;
+    public List<OrderItem> getItems() {
+        return items;
     }
 
-    public void setTotal(Double total) {
-        this.total = total;
+    public void setItems(List<OrderItem> items) {
+        this.items = items;
+    }
+
+    public Instant getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(Instant orderDate) {
+        this.orderDate = orderDate;
     }
 
     public OrderStatus getStatus() {
