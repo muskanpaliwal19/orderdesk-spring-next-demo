@@ -8,6 +8,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.Instant;
+import org.hibernate.annotations.CreationTimestamp;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
@@ -31,6 +33,10 @@ public class Customer {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CustomerTier tier;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
 
     public Customer() {
     }
@@ -71,5 +77,9 @@ public class Customer {
 
     public void setTier(CustomerTier tier) {
         this.tier = tier;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 }
