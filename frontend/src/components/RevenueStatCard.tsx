@@ -52,7 +52,7 @@ const RevenueStatCard: React.FC<RevenueStatCardProps> = ({
       )}
       {!isLoading && !isError && totalRevenue !== undefined && (
         <p className="text-3xl font-bold text-gray-900">
-          {formatCurrency(totalRevenue)}
+          {formatCurrency(totalRevenue / 100)}
         </p>
       )}
        {!isLoading && !isError && totalRevenue === undefined && (
