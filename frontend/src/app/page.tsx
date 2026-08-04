@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import OrderSlidePanel from '../components/orders/OrderSlidePanel';
-import OrderCard from '../components/OrderCard';
-import EmptyState from '../components/EmptyState';
-import RevenueStatCard from '../components/RevenueStatCard';
+import OrderSlidePanel from '@/components/orders/OrderSlidePanel';
+import OrderCard from '@/components/OrderCard';
+import EmptyState from '@/components/EmptyState';
+import RevenueStatCard from '@/components/RevenueStatCard';
 import { useOrders } from '@/hooks/useOrders';
 import { useRevenue } from '@/hooks/useRevenue';
 

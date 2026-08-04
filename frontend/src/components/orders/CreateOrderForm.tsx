@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import LineItemRow from './LineItemRow';
-import AlertBanner from '../ui/AlertBanner';
+import AlertBanner from '@/components/ui/AlertBanner';
 import { Customer } from '@/types/customer';
 import { Product } from '@/types/product';
 import { useCreateOrder } from '@/hooks/useCreateOrder';
@@ -156,7 +156,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onCancel, onOrderCrea
         <div className="p-4 rounded-2xl bg-gray-100 border border-gray-200 mb-5">
             <div className="flex justify-between items-center">
                 <span className="text-gray-600 text-sm font-semibold">Estimated total</span>
-                <span className="text-2xl font-extrabold text-green-700">${total.toFixed(2)}</span>
+                <span className="text-2xl font-extrabold text-green-700">${(total / 100).toFixed(2)}</span>
             </div>
             <div className="text-gray-500 text-xs mt-1">{lineItems.length} item(s) · Final total confirmed after submission</div>
         </div>
