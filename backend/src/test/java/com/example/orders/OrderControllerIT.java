@@ -132,7 +132,7 @@ class OrderControllerIT {
                 .andExpect(result -> {
                     String csvContent = result.getResponse().getContentAsString();
                     // Split lines and filter out empty lines
-                    String[] lines = csvContent.split("\\r?\\n");
+                    String[] lines = csvContent.split("\r?\n");
                     long actualRowCount = java.util.Arrays.stream(lines)
                             .filter(line -> !line.trim().isEmpty())
                             .count();
@@ -159,7 +159,7 @@ class OrderControllerIT {
         assertThat(auditLogRepository.count()).isEqualTo(initialAuditLogCount + 1);
         AuditLog auditLog = auditLogRepository.findTop50ByOrderByCreatedAtDesc().get(0);
         assertThat(auditLog.getEventType()).isEqualTo("ORDER_CREATED");
-        assertThat(auditLog.getMessage()).contains(""orderId"");
+        assertThat(auditLog.getMessage()).contains("\"orderId\"");
     }
 
     @Test
@@ -175,7 +175,7 @@ class OrderControllerIT {
         assertThat(auditLogRepository.count()).isEqualTo(initialAuditLogCount + 1);
         AuditLog auditLog = auditLogRepository.findTop50ByOrderByCreatedAtDesc().get(0);
         assertThat(auditLog.getEventType()).isEqualTo("ORDER_STATUS_UPDATED");
-        assertThat(auditLog.getMessage()).contains(""orderId\":" + orderId);
-        assertThat(auditLog.getMessage()).contains(""newStatus\":\"SHIPPED\"");
+        assertThat(auditLog.getMessage()).contains("\"orderId\":" + orderId);
+        assertThat(auditLog.getMessage()).contains("\"newStatus\":\"SHIPPED\"");
     }
 }

@@ -9,6 +9,9 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
+import org.springframework.stereotype.Repository;
+
+@Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("""
