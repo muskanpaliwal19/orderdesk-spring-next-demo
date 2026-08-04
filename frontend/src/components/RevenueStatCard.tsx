@@ -7,11 +7,11 @@ interface RevenueStatCardProps {
   isError: boolean;
 }
 
-const formatCurrency = (dollars: number): string => {
+const formatCurrency = (cents: number): string => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-  }).format(dollars);
+  }).format((cents || 0) / 100);
 };
 
 const DollarIcon = () => (
@@ -52,12 +52,12 @@ const RevenueStatCard: React.FC<RevenueStatCardProps> = ({
       )}
       {!isLoading && !isError && totalRevenue !== undefined && (
         <p className="text-3xl font-bold text-gray-900">
-          {formatCurrency(totalRevenue / 100)}
+          {formatCurrency(totalRevenue)}
         </p>
       )}
        {!isLoading && !isError && totalRevenue === undefined && (
          <p className="text-3xl font-bold text-gray-900">-</p>
-      )}
+       )}
     </div>
   );
 };
