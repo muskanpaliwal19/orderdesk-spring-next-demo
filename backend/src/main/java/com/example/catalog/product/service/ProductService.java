@@ -20,7 +20,7 @@ public class ProductService {
 
     public List<ProductDto> getSimilarProducts(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + id));
+                .orElseThrow(() -> new ProductNotFoundException("Product not found."));
 
         return productRepository.findByCategoryAndIdNot(product.getCategory(), id).stream()
                 .map(p -> new ProductDto(p.getId(), p.getName(), p.getDescription(), p.getPrice(), p.getCategory()))
