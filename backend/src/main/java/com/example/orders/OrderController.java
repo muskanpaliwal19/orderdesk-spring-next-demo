@@ -54,7 +54,7 @@ public class OrderController {
 
         List<OrderExportRow> orders = orderService.findOrdersForExport(status);
         try (PrintWriter writer = response.getWriter()) {
-            writer.println("Order ID,Customer Email,Status,Order Date,Total Amount");
+            writer.println("id,customer_email,status,order_date,total_cents");
 
             for (OrderExportRow order : orders) {
                 writer.println(
@@ -62,7 +62,7 @@ public class OrderController {
                                 sanitizeForCsv(order.customerEmail()) + "," +
                                 sanitizeForCsv(order.status()) + "," +
                                 sanitizeForCsv(order.orderDate()) + "," +
-                                sanitizeForCsv(order.totalCents() / 100.0)
+                                sanitizeForCsv(order.totalCents())
                 );
             }
         }

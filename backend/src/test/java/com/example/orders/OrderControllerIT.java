@@ -70,11 +70,11 @@ class OrderControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Disposition", "attachment; filename=\"orders.csv\""))
                 .andExpect(content().contentType("text/csv"))
-                .andExpect(content().string(containsString("Order ID,Customer Email,Status,Order Date,Total Amount"))) 
+                .andExpect(content().string(containsString("id,customer_email,status,order_date,total_cents"))) 
                 .andExpect(content().string(containsString("customer1@example.com,NEW")))
-                .andExpect(content().string(containsString("10.0")))
+                .andExpect(content().string(containsString(",1000")))
                 .andExpect(content().string(containsString("customer2@example.com,PAID")))
-                .andExpect(content().string(containsString("50.0")));
+                .andExpect(content().string(containsString(",5000")));
     }
 
     @Test
@@ -83,11 +83,11 @@ class OrderControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Disposition", "attachment; filename=\"orders.csv\""))
                 .andExpect(content().contentType("text/csv"))
-                .andExpect(content().string(containsString("Order ID,Customer Email,Status,Order Date,Total Amount")))
+                .andExpect(content().string(containsString("id,customer_email,status,order_date,total_cents")))
                 .andExpect(content().string(not(containsString("customer1@example.com,NEW"))))
-                .andExpect(content().string(not(containsString("10.0"))))
+                .andExpect(content().string(not(containsString(",1000"))))
                 .andExpect(content().string(containsString("customer2@example.com,PAID")))
-                .andExpect(content().string(containsString("50.0")));
+                .andExpect(content().string(containsString(",5000")));
     }
 
     @Test
@@ -98,7 +98,7 @@ class OrderControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Disposition", "attachment; filename=\"orders.csv\""))
                 .andExpect(content().contentType("text/csv"))
-                .andExpect(content().string("Order ID,Customer Email,Status,Order Date,Total Amount\n"));
+                .andExpect(content().string("id,customer_email,status,order_date,total_cents\n"));
     }
 
     @Test
