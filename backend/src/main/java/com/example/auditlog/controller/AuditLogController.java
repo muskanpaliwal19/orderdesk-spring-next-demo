@@ -1,5 +1,6 @@
 package com.example.auditlog.controller;
 
+import com.example.auditlog.controller.dto.AuditLogDto;
 import com.example.auditlog.jpa.AuditLog;
 import com.example.auditlog.service.AuditLogService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/audit-logs")
@@ -23,7 +25,9 @@ public class AuditLogController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public List<AuditLog> getRecentAuditLogs() {
-        return auditLogService.getRecentAuditLogs();
+    public List<AuditLogDto> getRecentAuditLogs() {
+        return auditLogService.getRecentAuditLogs().stream()
+                .map(AuditLogDto::fromEntity)
+                .collect(Collectors.toList());
     }
 }
