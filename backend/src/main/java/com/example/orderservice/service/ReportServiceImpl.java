@@ -26,8 +26,7 @@ public class ReportServiceImpl implements ReportService {
         List<RevenueReportDto.RevenueByDate> revenueByDateList = dailyRevenueResults.stream()
                 .map(result -> {
                     BigDecimal revenueInCents = (BigDecimal) result[1];
-                    BigDecimal revenueInDollars = revenueInCents.divide(new BigDecimal(100));
-                    return new RevenueReportDto.RevenueByDate(((java.sql.Date) result[0]).toLocalDate(), revenueInDollars);
+                    return new RevenueReportDto.RevenueByDate(((java.sql.Date) result[0]).toLocalDate(), revenueInCents);
                 })
                 .collect(Collectors.toList());
 
@@ -39,8 +38,7 @@ public class ReportServiceImpl implements ReportService {
         List<RevenueReportDto.RevenueByStatus> revenueByStatusList = revenueByStatusResults.stream()
                 .map(result -> {
                     BigDecimal revenueInCents = (BigDecimal) result[2];
-                    BigDecimal revenueInDollars = revenueInCents.divide(new BigDecimal(100));
-                    return new RevenueReportDto.RevenueByStatus((String) result[0], ((Number) result[1]).longValue(), revenueInDollars);
+                    return new RevenueReportDto.RevenueByStatus((String) result[0], ((Number) result[1]).longValue(), revenueInCents);
                 })
                 .collect(Collectors.toList());
 
