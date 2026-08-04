@@ -23,7 +23,7 @@ test.describe('Revenue Report', () => {
     await expect(revenueCard).toBeVisible();
 
     // Check for the correctly formatted currency
-    const revenueValue = revenueCard.locator('p');
+    const revenueValue = revenueCard.locator('p.text-3xl');
     await expect(revenueValue).toHaveText('$1,234.56');
   });
 });
