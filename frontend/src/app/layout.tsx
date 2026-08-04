@@ -19,6 +19,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+                <header style={{ padding: '1rem', borderBottom: '1px solid #ddd' }}>
+          <nav style={{ display: 'flex', gap: '1rem' }}>
+            <a href="/">Home</a>
+            <a href="/quotes">Quotes</a>
+          </nav>
+        </header>
         {children}
         <Toaster />
       </body>
