@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -29,7 +28,7 @@ public class AuditLogService {
     }
 
     public List<AuditLog> getRecentAuditLogs() {
-        return auditLogRepository.findAll(PageRequest.of(0, 50, Sort.by(Sort.Direction.DESC, "createdAt"))).getContent();
+        return auditLogRepository.findByOrderByCreatedAtDesc(PageRequest.of(0, 50));
     }
 
     public void logEvent(AuditEventType eventType, Map<String, Object> eventDetailsMap) {

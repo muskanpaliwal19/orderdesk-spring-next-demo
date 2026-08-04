@@ -2,6 +2,7 @@ package com.example.orders;
 
 import com.example.auditlog.jpa.AuditLog;
 import com.example.auditlog.repository.AuditLogRepository;
+import org.springframework.data.domain.PageRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -157,7 +158,7 @@ class OrderControllerIT {
                 .andExpect(status().isOk());
 
         assertThat(auditLogRepository.count()).isEqualTo(initialAuditLogCount + 1);
-        AuditLog auditLog = auditLogRepository.findTop50ByOrderByCreatedAtDesc().get(0);
+        AuditLog auditLog = auditLogRepository.findByOrderByCreatedAtDesc(PageRequest.of(0, 1)).get(0);
         assertThat(auditLog.getEventType()).isEqualTo("ORDER_CREATED");
         assertThat(auditLog.getMessage()).contains("\"orderId\"");
     }
@@ -173,7 +174,7 @@ class OrderControllerIT {
                 .andExpect(status().isOk());
 
         assertThat(auditLogRepository.count()).isEqualTo(initialAuditLogCount + 1);
-        AuditLog auditLog = auditLogRepository.findTop50ByOrderByCreatedAtDesc().get(0);
+        AuditLog auditLog = auditLogRepository.findByOrderByCreatedAtDesc(PageRequest.of(0, 1)).get(0);
         assertThat(auditLog.getEventType()).isEqualTo("ORDER_STATUS_UPDATED");
         assertThat(auditLog.getMessage()).contains("\"orderId\":" + orderId);
         assertThat(auditLog.getMessage()).contains("\"newStatus\":\"SHIPPED\"");
