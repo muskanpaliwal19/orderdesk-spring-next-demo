@@ -48,21 +48,11 @@ public class OrderController {
     }
 
     @GetMapping("/export")
-    public void exportOrders(HttpServletResponse response, @RequestParam(required = false) String status) throws IOException {
-        OrderStatus orderStatus = null;
-        if (status != null && !status.isEmpty()) {
-            try {
-                orderStatus = OrderStatus.valueOf(status.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid status value");
-                return;
-            }
-        }
-
+    public void exportOrders(HttpServletResponse response, @RequestParam(required = false) OrderStatus status) throws IOException {
         response.setContentType("text/csv");
         response.setHeader("Content-Disposition", "attachment; filename=\"orders.csv\"");
 
-        List<OrderExportRow> orders = orderService.findOrdersForExport(orderStatus);
+        List<OrderExportRow> orders = orderService.findOrdersForExport(status);
         try (PrintWriter writer = response.getWriter()) {
             writer.println("Order ID,Customer Email,Status,Order Date,Total Amount");
 
