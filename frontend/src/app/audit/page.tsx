@@ -95,7 +95,7 @@ export default function AuditTrailPage() {
       </div>
         { !loading &&
             <div className="mt-3 text-xs text-gray-400 text-right">
-                Showing {auditLogs.length} of {auditLogs.length} entries
+                Showing {auditLogs.length} entries
             </div>
         }
     </main>
