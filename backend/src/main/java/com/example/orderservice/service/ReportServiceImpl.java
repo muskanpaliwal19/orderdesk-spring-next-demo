@@ -24,7 +24,11 @@ public class ReportServiceImpl implements ReportService {
     public RevenueReportDto getRevenueReport() {
         List<Object[]> dailyRevenueResults = orderRepository.findDailyRevenue();
         List<RevenueReportDto.RevenueByDate> revenueByDateList = dailyRevenueResults.stream()
-                .map(result -> new RevenueReportDto.RevenueByDate(((java.sql.Date) result[0]).toLocalDate(), (BigDecimal) result[1]))
+                .map(result -> {
+                    BigDecimal revenueInCents = (BigDecimal) result[1];
+                    BigDecimal revenueInDollars = revenueInCents.divide(new BigDecimal(100));
+                    return new RevenueReportDto.RevenueByDate(((java.sql.Date) result[0]).toLocalDate(), revenueInDollars);
+                })
                 .collect(Collectors.toList());
 
         BigDecimal totalRevenue = revenueByDateList.stream()
@@ -33,7 +37,11 @@ public class ReportServiceImpl implements ReportService {
 
         List<Object[]> revenueByStatusResults = orderRepository.findRevenueByStatus();
         List<RevenueReportDto.RevenueByStatus> revenueByStatusList = revenueByStatusResults.stream()
-                .map(result -> new RevenueReportDto.RevenueByStatus((String) result[0], ((Number) result[1]).longValue(), (BigDecimal) result[2]))
+                .map(result -> {
+                    BigDecimal revenueInCents = (BigDecimal) result[2];
+                    BigDecimal revenueInDollars = revenueInCents.divide(new BigDecimal(100));
+                    return new RevenueReportDto.RevenueByStatus((String) result[0], ((Number) result[1]).longValue(), revenueInDollars);
+                })
                 .collect(Collectors.toList());
 
         return new RevenueReportDto(revenueByDateList, totalRevenue, revenueByStatusList);
