@@ -7,6 +7,8 @@ import com.example.audit.AuditLogRepository;
 import com.example.orders.dto.OrderExportRow;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,8 +39,18 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    public List<OrderExportRow> findOrdersForExport(OrderStatus status) {
-        return orderRepository.findOrdersForExport(status);
+    public void exportOrdersToCsv(PrintWriter writer, OrderStatus status) {
+        List<OrderExportRow> orders = orderRepository.findOrdersForExport(status);
+        writer.println("Order ID,Customer Email,Status,Order Date,Total Amount");
+
+        for (OrderExportRow order : orders) {
+            writer.println(
+                    order.id() + "," +
+                            order.customerEmail() + "," +
+                            order.status() + "," +
+                            order.orderDate() + "," +
+                            order.totalCents()
+            );
+        }
     }
 }
-
